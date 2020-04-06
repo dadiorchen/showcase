@@ -18,9 +18,9 @@ The component to show this Navigator. I am using Redux, but furthermore, I build
 
 To test the component of the navigator, because I have tested the logic of the model, so here just test if it invokes the model correctly.
 
-* Hashtag.js
+* HashtagModel.js HashtagModel.test.js
 
-A complicated model.
+A complicated model and test.
 
 * summerConnect.js
 
