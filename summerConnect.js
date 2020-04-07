@@ -4,45 +4,45 @@
  * REVISE	Thu Feb 28 19:18:55 CST 2019
  * 	Add delegate function.
  */
-import React		from 'react'
+import React from 'react'
 
-import {SummerContext}		from './SummerProvider.js'
-import {Factory}		from '../factory.js'
+import { SummerContext } from './SummerProvider.js'
+import { Factory } from '../factory.js'
 
-const log		= require('loglevel').getLogger('../summer/summerConnect.js')
+const log = require('loglevel').getLogger('../summer/summerConnect.js')
 
 export function summerConnect(
-	mapSummerToProps	: (factory : Factory) => Object		= () => ({}),
-	options?	: {
-		withRef		: boolean,
+	mapSummerToProps: (factory: Factory) => Object = () => ({}),
+	options?: {
+		withRef: boolean,
 	},
-	delegates?		: 
-		(factory : Factory) => Array<{delegate : Function, to : Function}>,
-){
+	delegates?:
+		(factory: Factory) => Array<{ delegate: Function, to: Function }>,
+) {
 	//{{{
-	const label		= 'summerConnect'
-	if(options && options.withRef === true){
+	const label = 'summerConnect'
+	if (options && options.withRef === true) {
 		/*
 		 * handle connect with REF
 		 */
 		return function wrapWithConnect(
-			WrappedComponent	: any,
-		){
-			class S extends React.Component<{},{}>{
-				render(){
+			WrappedComponent: any,
+		) {
+			class S extends React.Component<{}, {}>{
+				render() {
 					return (
 						<SummerContext.Consumer>
-							{(factory : Factory) => {
-								const props	= mapSummerToProps(factory)
+							{(factory: Factory) => {
+								const props = mapSummerToProps(factory)
 								/* Must inject component factory */
-								props.factoryComponent	= factory.getFactoryComponent()
+								props.factoryComponent = factory.getFactoryComponent()
 								/* Must inject i18next factory */
-								props.getI18next		= factory.getI18next
+								props.getI18next = factory.getI18next
 								/* Must inject event model factory */
-								props.getEventModel		= factory.getEventModel
-								return <WrappedComponent 
-									{...this.props} 
-									{...props} 
+								props.getEventModel = factory.getEventModel
+								return <WrappedComponent
+									{...this.props}
+									{...props}
 									/* $FlowFixMe */
 									ref={this.props.forwardedRef}
 								/>
@@ -52,27 +52,27 @@ export function summerConnect(
 				}
 			}
 			//$FlowFixMe
-			const ComponentSummered		= React.forwardRef((props, ref) => {
+			const ComponentSummered = React.forwardRef((props, ref) => {
 				return <S {...props} forwardedRef={ref} />;
 			})
-			ComponentSummered.displayName		= `Summer(${getDisplayName(WrappedComponent)})`
+			ComponentSummered.displayName = `Summer(${getDisplayName(WrappedComponent)})`
 			return ComponentSummered
 		}
-	}else if(delegates){
+	} else if (delegates) {
 		/*
 		 * do delegate connect
 		 */
 		return function wrapWithConnect(
-			WrappedComponent	: any,
-		){
-			class ComponentSummered extends React.Component<{},{}>{
-				render(){
+			WrappedComponent: any,
+		) {
+			class ComponentSummered extends React.Component<{}, {}>{
+				render() {
 					return (
 						<SummerContext.Consumer>
-							{(factory : Factory) => {
-								class Inner extends React.Component<{},{}>{
-									ref		: any
-									constructor(props){
+							{(factory: Factory) => {
+								class Inner extends React.Component<{}, {}>{
+									ref: any
+									constructor(props) {
 										super(props)
 										/*
 										 * delegate fn s
@@ -83,8 +83,8 @@ export function summerConnect(
 											})
 										})
 									}
-									render(){
-										return(
+									render() {
+										return (
 											<WrappedComponent
 												ref={r => this.ref = r}
 												{...this.props}
@@ -92,13 +92,13 @@ export function summerConnect(
 										)
 									}
 								}
-								const props	= mapSummerToProps(factory)
+								const props = mapSummerToProps(factory)
 								/* Must inject component factory */
-								props.factoryComponent	= factory.getFactoryComponent()
+								props.factoryComponent = factory.getFactoryComponent()
 								/* Must inject i18next factory */
-								props.getI18next		= factory.getI18next
+								props.getI18next = factory.getI18next
 								/* Must inject event model factory */
-								props.getEventModel		= factory.getEventModel
+								props.getEventModel = factory.getEventModel
 								return <Inner
 									{...this.props}
 									{...props}
@@ -108,38 +108,38 @@ export function summerConnect(
 					)
 				}
 			}
-			ComponentSummered.displayName		= `Summer(${getDisplayName(WrappedComponent)})`
+			ComponentSummered.displayName = `Summer(${getDisplayName(WrappedComponent)})`
 			return ComponentSummered
 		}
-	}else{
+	} else {
 		/*
 		 * A ordinary connect
 		 */
 		return function wrapWithConnect(
-			WrappedComponent	: any,
-		){
-			class ComponentSummered extends React.Component<{},{}>{
-				render(){
+			WrappedComponent: any,
+		) {
+			class ComponentSummered extends React.Component<{}, {}>{
+				render() {
 					return (
 						<SummerContext.Consumer>
-							{(factory : Factory) => {
-								const props	= mapSummerToProps(factory)
+							{(factory: Factory) => {
+								const props = mapSummerToProps(factory)
 								/* Must inject component factory */
-								props.factoryComponent	= factory.getFactoryComponent()
+								props.factoryComponent = factory.getFactoryComponent()
 								/* Must inject i18next factory */
-								props.getI18next		= factory.getI18next.bind(factory)
+								props.getI18next = factory.getI18next.bind(factory)
 								/* Must inject event model factory */
-								props.getEventModel		= factory.getEventModel
-								return <WrappedComponent 
-									{...this.props} 
-									{...props} 
+								props.getEventModel = factory.getEventModel
+								return <WrappedComponent
+									{...this.props}
+									{...props}
 								/>
 							}}
 						</SummerContext.Consumer>
 					)
 				}
 			}
-			ComponentSummered.displayName		= `Summer(${getDisplayName(WrappedComponent)})`
+			ComponentSummered.displayName = `Summer(${getDisplayName(WrappedComponent)})`
 			return ComponentSummered
 		}
 	}
@@ -147,5 +147,5 @@ export function summerConnect(
 }
 
 function getDisplayName(WrappedComponent) {
-  return WrappedComponent.displayName || WrappedComponent.name || 'Component';
+	return WrappedComponent.displayName || WrappedComponent.name || 'Component';
 }

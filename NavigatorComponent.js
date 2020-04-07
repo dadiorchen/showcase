@@ -1,77 +1,77 @@
 /* The navigator tooltip component */
 //@flow
 import React from "react"
-import ReactDOM		from 'react-dom'
-import jQuery			from 'jquery'
-import {connect}	from 'react-redux'
-import {compose}		from 'redux'
-import StateMachine		from 'javascript-state-machine'
+import ReactDOM from 'react-dom'
+import jQuery from 'jquery'
+import { connect } from 'react-redux'
+import { compose } from 'redux'
+import StateMachine from 'javascript-state-machine'
 
-import {Navigator as NavigatorModel,Position}	from '../model/Navigator.js'
-import {Factory}		from '../factory.js'
-import {summerConnect}		from '../summer/summerConnect.js'
-import {NoteModel}		from '../model/NoteModel.js'
-import {type StateType}	from '../model/store.js'
-import {utils}			from '../utils/Utils.js'
-import {Note}			from '../model/Note.js'
-import {Hashtag}		from '../model/Hashtag.js'
-import {FactoryComponent}		from '../factoryComponent.js'
-import {HashtagModel}		from '../model/HashtagModel.js'
-import {MindmapModel}		from '../model/MindmapModel.js'
-import {type NavigatorType}		from '../model/states/StateNavigator.js'
-import {type TypeMenuStatus}		from '../types.js'
-import {ERROR}		from '../error.js'
-import {HashtagTooltip}		from '../model/HashtagTooltip.js'
+import { Navigator as NavigatorModel, Position } from '../model/Navigator.js'
+import { Factory } from '../factory.js'
+import { summerConnect } from '../summer/summerConnect.js'
+import { NoteModel } from '../model/NoteModel.js'
+import { type StateType } from '../model/store.js'
+import { utils } from '../utils/Utils.js'
+import { Note } from '../model/Note.js'
+import { Hashtag } from '../model/Hashtag.js'
+import { FactoryComponent } from '../factoryComponent.js'
+import { HashtagModel } from '../model/HashtagModel.js'
+import { MindmapModel } from '../model/MindmapModel.js'
+import { type NavigatorType } from '../model/states/StateNavigator.js'
+import { type TypeMenuStatus } from '../types.js'
+import { ERROR } from '../error.js'
+import { HashtagTooltip } from '../model/HashtagTooltip.js'
 
-const log	= require('loglevel').getLogger('../component/Navigator.js')
+const log = require('loglevel').getLogger('../component/Navigator.js')
 
 
 type Props = {
-	goto		: (hashtagId : string, anchor? : string) => Promise<boolean>,
-	navigator		: NavigatorType,
-	documentRoot	: Hashtag | Note,
-	menuStatus		: TypeMenuStatus,
+	goto: (hashtagId: string, anchor?: string) => Promise<boolean>,
+	navigator: NavigatorType,
+	documentRoot: Hashtag | Note,
+	menuStatus: TypeMenuStatus,
 
-	factoryComponent	: FactoryComponent,
-	getHashtagModel		: () => HashtagModel,
-	getNavigatorModel	: () => NavigatorModel,
-	getNoteModel		: () => NoteModel,
-	getMindmapModel		: () => MindmapModel,
-	getHashtagTooltip		: () => HashtagTooltip,
+	factoryComponent: FactoryComponent,
+	getHashtagModel: () => HashtagModel,
+	getNavigatorModel: () => NavigatorModel,
+	getNoteModel: () => NoteModel,
+	getMindmapModel: () => MindmapModel,
+	getHashtagTooltip: () => HashtagTooltip,
 }
 type State = {
-	isMenuVisible : boolean,
-	menuX : number,
-	menuY : number,
-	menuItems : Array<Position>,
-	breadcrumbs		: Array<string>,
+	isMenuVisible: boolean,
+	menuX: number,
+	menuY: number,
+	menuItems: Array<Position>,
+	breadcrumbs: Array<string>,
 	/*
 	 * This is for a status: when user click button of back/forward, then, 
 	 * set this variable to true, so, UI should disable some operation, like:
 	 * click the back/forward again
 	 */
-	isProcessing		: boolean,
+	isProcessing: boolean,
 }
-export class Navigator extends React.Component<Props,State>{
-	static defaultProps		= {
+export class Navigator extends React.Component<Props, State>{
+	static defaultProps = {
 	}
 
-	backRef		: any;
-	forwardRef	: any;
+	backRef: any;
+	forwardRef: any;
 	/* the timer to control the menu show/hide.*/
-	timerRef	: any
-	timerBRef	: any
-	timerBackEnter		: any
-	timerBackLeave		: any
-	timerForwardEnter		: any
-	timerForwardLeave		: any
-	timerMenuLeave		: any
+	timerRef: any
+	timerBRef: any
+	timerBackEnter: any
+	timerBackLeave: any
+	timerForwardEnter: any
+	timerForwardLeave: any
+	timerMenuLeave: any
 	//the ms of delay time to show the menu 
-	durationDelay	: number	= 1000
-	durationDelayLeave	: number	= 500
+	durationDelay: number = 1000
+	durationDelayLeave: number = 500
 	//the state machine for menu display
-	menuState		: StateMachine	
-	constructor( props : Props){
+	menuState: StateMachine
+	constructor(props: Props) {
 		//{{{
 		super(props);
 		//check
@@ -84,91 +84,91 @@ export class Navigator extends React.Component<Props,State>{
 		utils.isType(props.getHashtagTooltip, 'Function')
 
 		this.state = {
-			isMenuVisible : false,
-			menuX : 0,
-			menuY : 0,
-			menuItems : [],
-			breadcrumbs		: [],
-			isProcessing		: false,
+			isMenuVisible: false,
+			menuX: 0,
+			menuY: 0,
+			menuItems: [],
+			breadcrumbs: [],
+			isProcessing: false,
 		}
-		this.menuState		= this.buildMenuState()
+		this.menuState = this.buildMenuState()
 		//bind
 		////$FlowFixMe
-		this.breadcrumbsGoto		= this.breadcrumbsGoto.bind(this)
+		this.breadcrumbsGoto = this.breadcrumbsGoto.bind(this)
 		//$FlowFixMe
-		this.buildMenuState		= this.buildMenuState.bind(this)
+		this.buildMenuState = this.buildMenuState.bind(this)
 		//$FlowFixMe
-		this.clearAllTimer		= this.clearAllTimer.bind(this)
+		this.clearAllTimer = this.clearAllTimer.bind(this)
 		//$FlowFixMe
-		this.getMenuState		= this.getMenuState.bind(this)
+		this.getMenuState = this.getMenuState.bind(this)
 		//$FlowFixMe
-		this.handleClickBack		= this.handleClickBack.bind(this)
+		this.handleClickBack = this.handleClickBack.bind(this)
 		//$FlowFixMe
-		this.handleClickForward		= this.handleClickForward.bind(this)
+		this.handleClickForward = this.handleClickForward.bind(this)
 		//$FlowFixMe
-		this.handleMenuClick		= this.handleMenuClick.bind(this)
+		this.handleMenuClick = this.handleMenuClick.bind(this)
 		//$FlowFixMe
-		this.handleMenuMouseEnter		= this.handleMenuMouseEnter.bind(this)
+		this.handleMenuMouseEnter = this.handleMenuMouseEnter.bind(this)
 		//$FlowFixMe
-		this.handleMenuMouseLeave		= this.handleMenuMouseLeave.bind(this)
+		this.handleMenuMouseLeave = this.handleMenuMouseLeave.bind(this)
 		//$FlowFixMe
-		this.handleMouseEnterBack		= this.handleMouseEnterBack.bind(this)
+		this.handleMouseEnterBack = this.handleMouseEnterBack.bind(this)
 		//$FlowFixMe
-		this.handleMouseEnterForward		= this.handleMouseEnterForward.bind(this)
+		this.handleMouseEnterForward = this.handleMouseEnterForward.bind(this)
 		//$FlowFixMe
-		this.handleMouseLeaveBack		= this.handleMouseLeaveBack.bind(this)
+		this.handleMouseLeaveBack = this.handleMouseLeaveBack.bind(this)
 		//$FlowFixMe
-		this.handleMouseLeaveForward		= this.handleMouseLeaveForward.bind(this)
+		this.handleMouseLeaveForward = this.handleMouseLeaveForward.bind(this)
 		//$FlowFixMe
-		this.hideMenu		= this.hideMenu.bind(this)
+		this.hideMenu = this.hideMenu.bind(this)
 		//$FlowFixMe
-		this.setMenuState		= this.setMenuState.bind(this)
+		this.setMenuState = this.setMenuState.bind(this)
 		//$FlowFixMe
-		this.showMenu		= this.showMenu.bind(this)
+		this.showMenu = this.showMenu.bind(this)
 		//$FlowFixMe
-		this.updateBreadcrumbs		= this.updateBreadcrumbs.bind(this)
+		this.updateBreadcrumbs = this.updateBreadcrumbs.bind(this)
 		//}}}
 	}
 	/********************** properties ************/
 	/********************** react method ***********/
-	componentDidMount(){
+	componentDidMount() {
 		//{{{
-		const label		= 'Navigator -> componentDidMount'
-		log.debug('%s:',label)
-		if(this.props.documentRoot){
+		const label = 'Navigator -> componentDidMount'
+		log.debug('%s:', label)
+		if (this.props.documentRoot) {
 			this.updateBreadcrumbs()
 		}
 		//}}}
 	}
 
-	componentDidUpdate(propsPrev : Props, statePrev : State){
+	componentDidUpdate(propsPrev: Props, statePrev: State) {
 		//{{{
-		const label		= 'Navigator -> componentDidUpdate'
-		log.debug('%s:',label)
-		if(
-			this.props.documentRoot && 
+		const label = 'Navigator -> componentDidUpdate'
+		log.debug('%s:', label)
+		if (
+			this.props.documentRoot &&
 			!propsPrev.documentRoot ||
-			this.props.documentRoot && 
+			this.props.documentRoot &&
 			propsPrev.documentRoot._id !== this.props.documentRoot._id
-		){
-			log.trace('%s:current hashtag changed, get breadcrumbs',label)
+		) {
+			log.trace('%s:current hashtag changed, get breadcrumbs', label)
 			this.updateBreadcrumbs()
 		}
 		//}}}
 	}
 	/********************** component method *******/
 	/* According current hashtag, get breadcrumbs */
-	updateBreadcrumbs(){
+	updateBreadcrumbs() {
 		//{{{
-		const label		= 'Navigator -> updateBreadcrumbs'
-		log.debug('%s:',label)
-		const {documentRoot, getHashtagModel}		= this.props
+		const label = 'Navigator -> updateBreadcrumbs'
+		log.debug('%s:', label)
+		const { documentRoot, getHashtagModel } = this.props
 		utils.isType(documentRoot, 'defined')
-		if(documentRoot instanceof Note){
+		if (documentRoot instanceof Note) {
 			log.error('%s:unsupported:%o', label, documentRoot)
 			throw utils.E(ERROR.GENERAL_LOGICAL_ERROR)
 		}
-		const breadcrumbs		= getHashtagModel()
+		const breadcrumbs = getHashtagModel()
 			.getBreadcrumbs(documentRoot._id)
 		this.setState({
 			breadcrumbs,
@@ -176,21 +176,21 @@ export class Navigator extends React.Component<Props,State>{
 		//}}}
 	}
 
-	handleMouseLeaveBack(){
+	handleMouseLeaveBack() {
 		//{{{
-		const label		= 'Navigator -> handleMouseLeaveBack'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleMouseLeaveBack'
+		log.debug('%s:', label)
 		this.clearAllTimer()
-		this.timerBackLeave		= setTimeout(() => {
+		this.timerBackLeave = setTimeout(() => {
 			this.menuState.backMouseLeaveAWhile()
 		}, this.durationDelayLeave)
 		//}}}
 	}
 
-	handleMouseEnterBack(){
+	handleMouseEnterBack() {
 		//{{{
-		const label		= 'Navigator -> handleMouseEnterBack'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleMouseEnterBack'
+		log.debug('%s:', label)
 		/* 
 		 * Mouse enter the button, clear previous timer, start new timer
 		 */
@@ -200,20 +200,20 @@ export class Navigator extends React.Component<Props,State>{
 		 * that means: the mouse was on the forward earlier, and just move 
 		 * to back, in this case, do not set timeout, show back menu directly
 		 */
-		if(this.menuState.state === 'forwardVisible'){
+		if (this.menuState.state === 'forwardVisible') {
 			this.menuState.moveFromForwardToBack()
-		}else{
-			this.timerBackEnter		= setTimeout(() => {
+		} else {
+			this.timerBackEnter = setTimeout(() => {
 				this.menuState.backMouseEnterAWhile()
-			},this.durationDelay)
+			}, this.durationDelay)
 		}
 		//}}}
 	}
 
-	handleMouseEnterForward(){
+	handleMouseEnterForward() {
 		//{{{
-		const label		= 'Navigator -> handleMouseEnterForward'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleMouseEnterForward'
+		log.debug('%s:', label)
 		/* 
 		 * Mouse enter the button, clear previous timer, start new timer
 		 */
@@ -221,22 +221,22 @@ export class Navigator extends React.Component<Props,State>{
 		/*
 		 * Move
 		 */
-		if(this.menuState.state === 'backVisible'){
+		if (this.menuState.state === 'backVisible') {
 			this.menuState.moveFromBackToForward()
-		}else{
-			this.timerForwardEnter		= setTimeout(() => {
+		} else {
+			this.timerForwardEnter = setTimeout(() => {
 				this.menuState.forwardMouseEnterAWhile()
-			},this.durationDelay)
+			}, this.durationDelay)
 		}
 		//}}}
 	}
 
-	handleMouseLeaveForward(){
+	handleMouseLeaveForward() {
 		//{{{
-		const label		= 'Navigator -> handleMouseLeaveForward'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleMouseLeaveForward'
+		log.debug('%s:', label)
 		this.clearAllTimer()
-		this.timerForwardLeave		= setTimeout(() => {
+		this.timerForwardLeave = setTimeout(() => {
 			this.menuState.forwardMouseLeaveAWhile()
 		}, this.durationDelayLeave)
 		//}}}
@@ -247,73 +247,73 @@ export class Navigator extends React.Component<Props,State>{
 	 * 	Change this fn to sync, because when user clicked the button, should
 	 * 	wait for it to be done.
 	 */
-	handleClickBack(){
+	handleClickBack() {
 		//{{{
-		const label		= 'Navigator -> handleClickBack'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleClickBack'
+		log.debug('%s:', label)
 		//to close menu 
 		this.menuState.changeNavigator()
-		const {getNavigatorModel, goto}		= this.props
+		const { getNavigatorModel, goto } = this.props
 		this.setState({
-			isProcessing		: true,
+			isProcessing: true,
 		}, async () => {
-			const position		= await utils.a(/*istanbul ignore next*/() => utils.E(), getNavigatorModel().goBack() )
-			if(position){
+			const position = await utils.a(/*istanbul ignore next*/() => utils.E(), getNavigatorModel().goBack())
+			if (position) {
 				utils.isType(
-					await utils.a(/* istanbul ignore next*/() => utils.E(), goto(position.getKey(),position.getKeyAnchor())),
+					await utils.a(/* istanbul ignore next*/() => utils.E(), goto(position.getKey(), position.getKeyAnchor())),
 					true
 				)
 			}
 			//finished
 			this.setState({
-				isProcessing		: false,
+				isProcessing: false,
 			})
 		})
 		//}}}
 	}
 
-	async handleClickForward(){
+	async handleClickForward() {
 		//{{{
-		const label		= 'Navigator -> handleClickForward'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleClickForward'
+		log.debug('%s:', label)
 		//to close menu 
 		this.menuState.changeNavigator()
-		const {getNavigatorModel, goto}		= this.props
+		const { getNavigatorModel, goto } = this.props
 		this.setState({
-			isProcessing		: true,
+			isProcessing: true,
 		}, async () => {
-			const position		= await utils.a(/*istanbul ignore next*/() => utils.E(), getNavigatorModel().goForward())
-			if(position){
+			const position = await utils.a(/*istanbul ignore next*/() => utils.E(), getNavigatorModel().goForward())
+			if (position) {
 				utils.isType(
-					await utils.a(/* istanbul ignore next*/() => utils.E(), goto(position.getKey(),position.getKeyAnchor())),
+					await utils.a(/* istanbul ignore next*/() => utils.E(), goto(position.getKey(), position.getKeyAnchor())),
 					true
 				)
 			}
 			//finished
 			this.setState({
-				isProcessing		: false,
+				isProcessing: false,
 			})
 		})
 		//}}}
 	}
 
-	handleMenuMouseLeave(){
+	handleMenuMouseLeave() {
 		//{{{
-		const label		= 'Navigator -> handleMenuMouseLeave'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleMenuMouseLeave'
+		log.debug('%s:', label)
 		//If leave , and no menu choose, then , need to hide menu
 		//automatically 
 		this.clearAllTimer()
-		this.timerMenuLeave		= setTimeout(() => {
+		this.timerMenuLeave = setTimeout(() => {
 			this.menuState.menuLeaveAWhile()
-		},this.durationDelayLeave)
+		}, this.durationDelayLeave)
 		//}}}
 	}
 
-	handleMenuMouseEnter(){
+	handleMenuMouseEnter() {
 		//{{{
-		const label		= 'Navigator -> handleMenuMouseEnter'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleMenuMouseEnter'
+		log.debug('%s:', label)
 		/*
 		 * Clear other timer, cuz some leave timer will hide the menu, to clear
 		 * it to avoid the menu closing
@@ -322,7 +322,7 @@ export class Navigator extends React.Component<Props,State>{
 		//}}}
 	}
 
-	clearAllTimer(){
+	clearAllTimer() {
 		clearTimeout(this.timerBackEnter)
 		clearTimeout(this.timerBackLeave)
 		clearTimeout(this.timerForwardEnter)
@@ -332,19 +332,19 @@ export class Navigator extends React.Component<Props,State>{
 	/*
 	 * Click the menu
 	 */
-	async handleMenuClick(position : Position){
+	async handleMenuClick(position: Position) {
 		//{{{
-		const label		= 'Navigator -> handleMenuClick'
-		log.debug('%s:',label)
+		const label = 'Navigator -> handleMenuClick'
+		log.debug('%s:', label)
 		//to close menu 
 		this.menuState.changeNavigator()
-		const {getNavigatorModel, } = this.props
-		const positionInNavigator		= await utils.a(/*istanbul ignore next*/() => utils.E(), getNavigatorModel().jump(position))
+		const { getNavigatorModel, } = this.props
+		const positionInNavigator = await utils.a(/*istanbul ignore next*/() => utils.E(), getNavigatorModel().jump(position))
 		/*istanbul ignore else: impossible*/
-		if(positionInNavigator){
-			log.debug('%s:jump to position:%s',label,position)
-			this.props.goto(position.getKey(),position.getKeyAnchor())
-		}else{
+		if (positionInNavigator) {
+			log.debug('%s:jump to position:%s', label, position)
+			this.props.goto(position.getKey(), position.getKeyAnchor())
+		} else {
 			log.error('%s:can not foundthe position to jump:%o',
 				label,
 				position
@@ -359,17 +359,17 @@ export class Navigator extends React.Component<Props,State>{
 	 * REVISE Thu Feb 21 05:49:35 CST 2019
 	 * 	Convert fn from async to sync
 	 */
-	breadcrumbsGoto(hashtagId : string){
+	breadcrumbsGoto(hashtagId: string) {
 		//{{{
-		const label		= 'Navigator -> breadcrumbsGoto'
-		log.debug('%s:',label)
-		const {getNavigatorModel, getHashtagTooltip, goto}		= this.props
+		const label = 'Navigator -> breadcrumbsGoto'
+		log.debug('%s:', label)
+		const { getNavigatorModel, getHashtagTooltip, goto } = this.props
 		/*
 		 * cancel tooltip
 		 */
 		getHashtagTooltip().handleMouseLeave()
 		this.setState({
-			isProcessing		: true,
+			isProcessing: true,
 		}, async () => {
 			utils.isType(
 				await utils.a(/*istanbul ignore next*/() => utils.E(), getNavigatorModel().visitHashtag(hashtagId)),
@@ -381,7 +381,7 @@ export class Navigator extends React.Component<Props,State>{
 			)
 			//finished
 			this.setState({
-				isProcessing		: false,
+				isProcessing: false,
 			})
 		})
 		//}}}
@@ -391,25 +391,25 @@ export class Navigator extends React.Component<Props,State>{
 	 * show menu list
 	 * limit the count to < 20
 	 */
-	showMenu(type : 'back'|'forward'){
+	showMenu(type: 'back' | 'forward') {
 		//{{{
-		const label		= 'Navigator -> showMenu'
-		log.debug('%s:',label)
-		const {getNavigatorModel}		= this.props
+		const label = 'Navigator -> showMenu'
+		log.debug('%s:', label)
+		const { getNavigatorModel } = this.props
 		utils.isTypeEnum(type, NavigatorModel.DIRECTION)
 		let menuX = 0;
 		let menuY = 0;
-		let menuItems : Array<Position>;
+		let menuItems: Array<Position>;
 		//TODO remove jQuery requirement
-		const {left,top} = jQuery(type === 'back' ?this.backRef : this.forwardRef).offset()
+		const { left, top } = jQuery(type === 'back' ? this.backRef : this.forwardRef).offset()
 		menuX = left;
 		menuY = top + 22;
-		if(type === 'back'){
-			menuItems		= getNavigatorModel().getPositionsBack().reverse()
-		}else{
-			menuItems		= getNavigatorModel().getPositionsForward()
+		if (type === 'back') {
+			menuItems = getNavigatorModel().getPositionsBack().reverse()
+		} else {
+			menuItems = getNavigatorModel().getPositionsForward()
 		}
-		menuItems		= menuItems.slice(0,15)
+		menuItems = menuItems.slice(0, 15)
 		log.debug(
 			'%s:to show menu at [%d,%d] with items %d',
 			label,
@@ -418,7 +418,7 @@ export class Navigator extends React.Component<Props,State>{
 			menuItems.length
 		)
 		this.setState({
-			isMenuVisible		: true,
+			isMenuVisible: true,
 			menuX,
 			menuY,
 			menuItems,
@@ -427,12 +427,12 @@ export class Navigator extends React.Component<Props,State>{
 	}
 
 	/*istanbul ignore next: tired*/
-	hideMenu(){
+	hideMenu() {
 		//{{{
-		const label		= 'Navigator -> hideMenu'
-		log.debug('%s:',label)
+		const label = 'Navigator -> hideMenu'
+		log.debug('%s:', label)
 		this.setState({
-			isMenuVisible		: false,
+			isMenuVisible: false,
 		})
 		//}}}
 	}
@@ -440,58 +440,58 @@ export class Navigator extends React.Component<Props,State>{
 	/*
 	 * To build the state machine
 	 */
-	buildMenuState(){
+	buildMenuState() {
 		return new StateMachine({
 			//{{{
-			init		: 'invisible',
-			transitions		: [
+			init: 'invisible',
+			transitions: [
 				{
 					//mouse enter back button hold for a while
-					name		: 'backMouseEnterAWhile',
-					from		: 'invisible',
-					to		: 'backVisible',
+					name: 'backMouseEnterAWhile',
+					from: 'invisible',
+					to: 'backVisible',
 				},
 				{
-					name		: 'forwardMouseEnterAWhile',
-					from		: 'invisible',
-					to		: 'forwardVisible',
+					name: 'forwardMouseEnterAWhile',
+					from: 'invisible',
+					to: 'forwardVisible',
 				},
 				{
-					name		: 'backMouseLeaveAWhile',
-					from		: 'backVisible',
-					to		: 'invisible',
+					name: 'backMouseLeaveAWhile',
+					from: 'backVisible',
+					to: 'invisible',
 				},
 				{
-					name		: 'forwardMouseLeaveAWhile',
-					from		: 'forwardVisible',
-					to		: 'invisible',
+					name: 'forwardMouseLeaveAWhile',
+					from: 'forwardVisible',
+					to: 'invisible',
 				},
 				{
 					//if mouse move out menu for a while, hide menu anyway
-					name		: 'menuLeaveAWhile',
-					from		: '*',
-					to		: 'invisible',
+					name: 'menuLeaveAWhile',
+					from: '*',
+					to: 'invisible',
 				},
 				{
-					name		: 'moveFromForwardToBack',
-					from		: 'forwardVisible',
-					to		: 'backVisible',
+					name: 'moveFromForwardToBack',
+					from: 'forwardVisible',
+					to: 'backVisible',
 				},
 				{
-					name		: 'moveFromBackToForward',
-					from		: 'backVisible',
-					to		: 'forwardVisible',
+					name: 'moveFromBackToForward',
+					from: 'backVisible',
+					to: 'forwardVisible',
 				},
 				{
 					//fire on: click menu item or click back/forward arrow
-					name		: 'changeNavigator',
-					from		: '*',
-					to		: 'invisible',
+					name: 'changeNavigator',
+					from: '*',
+					to: 'invisible',
 				},
-				{ name: 'goto', from: '*', to: function(s) { return s } }
+				{ name: 'goto', from: '*', to: function (s) { return s } }
 			],
-			methods		: {
-				onInvalidTransition: /*istanbul ignore next: impossible*/function(transition, from, to) {
+			methods: {
+				onInvalidTransition: /*istanbul ignore next: impossible*/function (transition, from, to) {
 					log.error(
 						"transition not allowed from that state",
 						transition,
@@ -499,24 +499,24 @@ export class Navigator extends React.Component<Props,State>{
 						to
 					)
 				},
-				onBackVisible		: () => {
+				onBackVisible: () => {
 					//{{{
-					const label		= 'menuState -> onBackVisible'
-					log.debug('%s:',label)
+					const label = 'menuState -> onBackVisible'
+					log.debug('%s:', label)
 					this.showMenu('back')
 					//}}}
 				},
-				onForwardVisible		: () => {
+				onForwardVisible: () => {
 					//{{{
-					const label		= 'menuState -> onForwardVisible'
-					log.debug('%s:',label)
+					const label = 'menuState -> onForwardVisible'
+					log.debug('%s:', label)
 					this.showMenu('forward')
 					//}}}
 				},
-				onInvisible		: () =>{
+				onInvisible: () => {
 					//{{{
-					const label		= 'menuState -> onInvisible'
-					log.debug('%s:',label)
+					const label = 'menuState -> onInvisible'
+					log.debug('%s:', label)
 					this.hideMenu()
 					//}}}
 				},
@@ -526,26 +526,26 @@ export class Navigator extends React.Component<Props,State>{
 
 	}
 
-	getMenuState(){
+	getMenuState() {
 		return this.menuState.state
 	}
 
-	setMenuState(state : string){
-		this.menuState.goto(state)	
+	setMenuState(state: string) {
+		this.menuState.goto(state)
 	}
 
-	render(){
-		const label		= 'Navigator -> render'
-		log.trace('%s:',label)
+	render() {
+		const label = 'Navigator -> render'
+		log.trace('%s:', label)
 		const {
 			getNavigatorModel,
-			documentRoot, 
+			documentRoot,
 			factoryComponent,
 			menuStatus,
 		} = this.props;
 		//$FlowFixMe
-		let documentHashtag	: Hashtag = documentRoot instanceof Hashtag ? documentRoot : undefined
-		const {isMenuVisible,menuX,menuY,menuItems, isProcessing} = this.state;
+		let documentHashtag: Hashtag = documentRoot instanceof Hashtag ? documentRoot : undefined
+		const { isMenuVisible, menuX, menuY, menuItems, isProcessing } = this.state;
 		const isBackAvailable = getNavigatorModel()
 			.getPositionsBack().length > 0 ? true : false;
 		const isForwardAvailable = getNavigatorModel()
@@ -554,21 +554,21 @@ export class Navigator extends React.Component<Props,State>{
 		 * The menu, should mount to body
 		 */
 		let menu
-		if(isMenuVisible && menuItems && menuItems.length > 0 ){
+		if (isMenuVisible && menuItems && menuItems.length > 0) {
 			//$FlowFixMe
-			menu	= ReactDOM.createPortal(
-				<div 
-					style={{left:menuX,top:menuY}}
-					className='pop-menu bf-menu __open' 
+			menu = ReactDOM.createPortal(
+				<div
+					style={{ left: menuX, top: menuY }}
+					className='pop-menu bf-menu __open'
 					onMouseLeave={this.handleMenuMouseLeave}
 					onMouseEnter={this.handleMenuMouseEnter}
 				>
 
 					<div className='pop-menu-lis' >
 						{menuItems.map(position =>
-							<li 
+							<li
 								style={{
-									userSelect	: 'none',
+									userSelect: 'none',
 								}}
 								onClick={/*istanbul ignore next: difficult*/() => this.handleMenuClick(position)}
 								key={position.format()}>
@@ -577,7 +577,7 @@ export class Navigator extends React.Component<Props,State>{
 										noteId={position.getKey()}
 										mode='navigator'
 									/>
-								:
+									:
 									<factoryComponent.Hashtag
 										mode='navigator'
 										hashtagId={position.getKey()}
@@ -592,37 +592,37 @@ export class Navigator extends React.Component<Props,State>{
 				</div>,
 				document.body
 			)
-		}else{
-			menu	= null
+		} else {
+			menu = null
 		}
 		return (
 			<div className='main-head-location' >
 				<div className='head-location-fb'>
-						<div 
-							ref={/*istanbul ignore next*/r => this.backRef = r}
-							onMouseEnter={isBackAvailable && !isProcessing? this.handleMouseEnterBack : undefined}
-							onMouseLeave={isBackAvailable && !isProcessing? this.handleMouseLeaveBack : undefined}
-							onClick={isBackAvailable && !isProcessing? this.handleClickBack : undefined}
-							className={`location-fb-backward ${isBackAvailable && !isProcessing?'button-svg-icon-valid':'button-svg-icon-invalid'} `}>
-							<div className="location-fb-backward-icon"></div>
-						</div>
-						<div 
-							ref={/*istanbul ignore next*/r => this.forwardRef = r}
-							onMouseEnter={isForwardAvailable && !isProcessing? this.handleMouseEnterForward : undefined}
-							onMouseLeave={isForwardAvailable && !isProcessing? this.handleMouseLeaveForward : undefined}
-							onClick={isForwardAvailable && !isProcessing? this.handleClickForward : undefined}
-							className={`location-fb-forward ${isForwardAvailable && !isProcessing?'button-svg-icon-valid':'button-svg-icon-invalid'} `}>
-							<div className="location-fb-forward-icon"></div>
-						</div>
+					<div
+						ref={/*istanbul ignore next*/r => this.backRef = r}
+						onMouseEnter={isBackAvailable && !isProcessing ? this.handleMouseEnterBack : undefined}
+						onMouseLeave={isBackAvailable && !isProcessing ? this.handleMouseLeaveBack : undefined}
+						onClick={isBackAvailable && !isProcessing ? this.handleClickBack : undefined}
+						className={`location-fb-backward ${isBackAvailable && !isProcessing ? 'button-svg-icon-valid' : 'button-svg-icon-invalid'} `}>
+						<div className="location-fb-backward-icon"></div>
+					</div>
+					<div
+						ref={/*istanbul ignore next*/r => this.forwardRef = r}
+						onMouseEnter={isForwardAvailable && !isProcessing ? this.handleMouseEnterForward : undefined}
+						onMouseLeave={isForwardAvailable && !isProcessing ? this.handleMouseLeaveForward : undefined}
+						onClick={isForwardAvailable && !isProcessing ? this.handleClickForward : undefined}
+						className={`location-fb-forward ${isForwardAvailable && !isProcessing ? 'button-svg-icon-valid' : 'button-svg-icon-invalid'} `}>
+						<div className="location-fb-forward-icon"></div>
+					</div>
 				</div>
 				<div className='head-location-nav'>
-					{this.state.breadcrumbs.map((hashtagId,i) => {
-						if(i === this.state.breadcrumbs.length - 1){
+					{this.state.breadcrumbs.map((hashtagId, i) => {
+						if (i === this.state.breadcrumbs.length - 1) {
 							return (
-								<div 
+								<div
 									key={`${hashtagId}-${i}`}
 									onClick={/*istanbul ignore next*/() => this.breadcrumbsGoto(hashtagId)}
-									className={`head-location-nav-current ${menuStatus === 'mindmap'?'__open':''}`} 
+									className={`head-location-nav-current ${menuStatus === 'mindmap' ? '__open' : ''}`}
 								>
 									<factoryComponent.Hashtag
 										hashtagId={hashtagId}
@@ -630,9 +630,9 @@ export class Navigator extends React.Component<Props,State>{
 									/>
 								</div>
 							)
-						}else{
+						} else {
 							return (
-								<div 
+								<div
 									key={`${hashtagId}-${i}`}
 									onClick={/*istanbul ignore next*/() => this.breadcrumbsGoto(hashtagId)}
 									className='head-location-nav-i'
@@ -646,36 +646,36 @@ export class Navigator extends React.Component<Props,State>{
 						}
 					})}
 				</div>
-			{menu}
+				{menu}
 			</div>
 		)
 	}
 }
 
-export const NavigatorConnected	= compose(
+export const NavigatorConnected = compose(
 	connect(
-		(state : StateType) => {
+		(state: StateType) => {
 			let documentRoot
-			if(state.hashtagIdCurrent.startsWith('n-')){
-				documentRoot	= state.noteByIds[state.hashtagIdCurrent]
-			}else{
-				documentRoot	= state.hashtagByIds[state.hashtagIdCurrent]
+			if (state.hashtagIdCurrent.startsWith('n-')) {
+				documentRoot = state.noteByIds[state.hashtagIdCurrent]
+			} else {
+				documentRoot = state.hashtagByIds[state.hashtagIdCurrent]
 			}
 			return {
 				documentRoot,
-				navigator	: state.navigator,
-				menuStatus		: state.menuStatus,
+				navigator: state.navigator,
+				menuStatus: state.menuStatus,
 			}
 		},
 	),
 	summerConnect(
-		(factory : Factory) => {
+		(factory: Factory) => {
 			return {
-				getNoteModel	: factory.getNoteModel,
-				getNavigatorModel	: factory.getNavigatorModel,
-				getHashtagModel		: factory.getHashtagModel,
-				getMindmapModel		: factory.getMindmapModel,
-				getHashtagTooltip		: factory.getHashtagTooltip,
+				getNoteModel: factory.getNoteModel,
+				getNavigatorModel: factory.getNavigatorModel,
+				getHashtagModel: factory.getHashtagModel,
+				getMindmapModel: factory.getMindmapModel,
+				getHashtagTooltip: factory.getHashtagTooltip,
 			}
 		}
 	)

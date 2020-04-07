@@ -1,108 +1,108 @@
 //@flow
-import React 				from 'react';
-import { storiesOf }		from '@storybook/react';
-import { action }			from '@storybook/addon-actions';
-import {Container}			from './Container.js'
-import {Note}				from '../model/Note.js'
-import {getStore}			from '../model/store.js'
-import {Hashtag}			from '../model/Hashtag.js'
-import {NoteHashtag}		from '../model/NoteHashtag.js'
-import {ViewerTodo}			from '../component/ViewerTodo.js'
-import {ViewerPic}			from '../component/ViewerPic.js'
-import {Position}			from '../model/Navigator.js'
-import {HashtagTooltip}		from '../component/HashtagTooltip.js'
-import {HashtagSettingConnected}		from '../component/HashtagSetting.js'
-import {FactoryTest,Factory}		from '../factory.js'
-import {HashtagConnected}		from '../component/Hashtag.js'
-import {utils}		from '../utils/Utils.js'
-import {Attachment}		from '../model/Attachment.js'
-import {HashtagSetting as HashtagSettingModel}		from '../model/HashtagSetting.js'
-import {HashtagAlias}		from '../model/HashtagAlias.js'
+import React from 'react';
+import { storiesOf } from '@storybook/react';
+import { action } from '@storybook/addon-actions';
+import { Container } from './Container.js'
+import { Note } from '../model/Note.js'
+import { getStore } from '../model/store.js'
+import { Hashtag } from '../model/Hashtag.js'
+import { NoteHashtag } from '../model/NoteHashtag.js'
+import { ViewerTodo } from '../component/ViewerTodo.js'
+import { ViewerPic } from '../component/ViewerPic.js'
+import { Position } from '../model/Navigator.js'
+import { HashtagTooltip } from '../component/HashtagTooltip.js'
+import { HashtagSettingConnected } from '../component/HashtagSetting.js'
+import { FactoryTest, Factory } from '../factory.js'
+import { HashtagConnected } from '../component/Hashtag.js'
+import { utils } from '../utils/Utils.js'
+import { Attachment } from '../model/Attachment.js'
+import { HashtagSetting as HashtagSettingModel } from '../model/HashtagSetting.js'
+import { HashtagAlias } from '../model/HashtagAlias.js'
 
-const log		= require('loglevel').getLogger('../stories/hashtag.js')
-const stories	= storiesOf('Hashtag', module)
+const log = require('loglevel').getLogger('../stories/hashtag.js')
+const stories = storiesOf('Hashtag', module)
 
 /* Hashtag */
 {
 	//{{{
-	class Test extends React.Component<{},{
+	class Test extends React.Component<{}, {
 		//the hashtags to display
-		hashtags		: Array<Hashtag>,
-	}>{	
-		constructor(props: any){
+		hashtags: Array<Hashtag>,
+	}>{
+		constructor(props: any) {
 			super(props)
 			/*
 			 * To build the hashtags
 			 */
-			const hashtags		= []
+			const hashtags = []
 			Hashtag.COLORS.forEach(color => {
-				const hashtag		= new Hashtag('Miditag')
-				hashtag.color		= color
+				const hashtag = new Hashtag('Miditag')
+				hashtag.color = color
 				hashtags.push(hashtag)
 			})
 			/*
 			 * To build hashtag with avatar
 			 */
 			Hashtag.COLORS.forEach(color => {
-				const hashtagAvatar		= new Hashtag('Miditag')
-				hashtagAvatar.avatar		= require('../temp/imageLogo.js').image
-				hashtagAvatar.avatarSize		= {
-					height		: 64,
-					width		: 64,
+				const hashtagAvatar = new Hashtag('Miditag')
+				hashtagAvatar.avatar = require('../temp/imageLogo.js').image
+				hashtagAvatar.avatarSize = {
+					height: 64,
+					width: 64,
 				}
-				hashtagAvatar.displayType		= 'text_icon'
-				hashtagAvatar.color		= color
+				hashtagAvatar.displayType = 'text_icon'
+				hashtagAvatar.color = color
 				hashtags.push(hashtagAvatar)
 			})
 			/*
 			 * Build hashtag which just show avatar ( no text)
 			 */
 			Hashtag.COLORS.forEach(color => {
-				const hashtagAvatar		= new Hashtag('Miditag')
-				hashtagAvatar.avatar		= require('../temp/imageLogo.js').image
-				hashtagAvatar.avatarSize		= {
-					height		: 64,
-					width		: 64,
+				const hashtagAvatar = new Hashtag('Miditag')
+				hashtagAvatar.avatar = require('../temp/imageLogo.js').image
+				hashtagAvatar.avatarSize = {
+					height: 64,
+					width: 64,
 				}
-				hashtagAvatar.displayType		= 'icon'
-				hashtagAvatar.color		= color
+				hashtagAvatar.displayType = 'icon'
+				hashtagAvatar.color = color
 				hashtags.push(hashtagAvatar)
 			})
-			this.state		= {
+			this.state = {
 				hashtags,
 			}
 		}
 
-		render(){
-			const {hashtags}		= this.state
-			const {Hashtag}		= require('../component/Hashtag.js')
-			const getAvatarModel		= () => ({
-				getSrc		: (a)		=> a,
+		render() {
+			const { hashtags } = this.state
+			const { Hashtag } = require('../component/Hashtag.js')
+			const getAvatarModel = () => ({
+				getSrc: (a) => a,
 			})
 			return [
 				<div>
 					<h3>
-					This story show all kinds hashtag in different case, 
-					with/withgout avatar, in dark/light background.
+						This story show all kinds hashtag in different case,
+						with/withgout avatar, in dark/light background.
 					</h3>
 				</div>,
 				<div
 					style={{
-						width		: '100%',
-						height		: '100vh',
-						display		: 'flex',
-						backgroundColor		: 'rgb(54, 57, 62)',
+						width: '100%',
+						height: '100vh',
+						display: 'flex',
+						backgroundColor: 'rgb(54, 57, 62)',
 					}}
 				>
 					<div
 						style={{
-							width		: '50%',
-							height		: '100vh',
-							lineHeight		: '18px',
+							width: '50%',
+							height: '100vh',
+							lineHeight: '18px',
 						}}
 						className='content-notes-list-note list-one-selected note-editor'
 					>
-						{hashtags.map(hashtag => 
+						{hashtags.map(hashtag =>
 							[
 								//$FlowFixMe
 								<Hashtag
@@ -116,14 +116,14 @@ const stories	= storiesOf('Hashtag', module)
 					</div>
 					<div
 						style={{
-							width		: '50%',
-							height		: '100vh',
-							background		: 'white',
-							lineHeight		: '18px',
+							width: '50%',
+							height: '100vh',
+							background: 'white',
+							lineHeight: '18px',
 						}}
 						className='content-notes-list-note list-one-selected note-editor'
 					>
-						{hashtags.map(hashtag => 
+						{hashtags.map(hashtag =>
 							[
 								//$FlowFixMe
 								<Hashtag
@@ -140,8 +140,8 @@ const stories	= storiesOf('Hashtag', module)
 			]
 		}
 	}
-	stories.add('Hashtags', () => 
-		<Test/>
+	stories.add('Hashtags', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -149,35 +149,35 @@ const stories	= storiesOf('Hashtag', module)
 /* tag panel */
 {
 	//{{{
-	const hashtags	= [new Hashtag('tagA'),new Hashtag('tagB'),new Hashtag('tagC')]
-	const store		= getStore({},{
+	const hashtags = [new Hashtag('tagA'), new Hashtag('tagB'), new Hashtag('tagC')]
+	const store = getStore({}, {
 		hashtags,
 	})
-	const searchHashtag	= (keyword : string) : Array<Hashtag> => {
+	const searchHashtag = (keyword: string): Array<Hashtag> => {
 		return hashtags.filter(hashtag => {
-			if(hashtag.name.indexOf(keyword) >= 0){
+			if (hashtag.name.indexOf(keyword) >= 0) {
 				return true
-			}else{
+			} else {
 				return false
 			}
 		})
 	}
 
-	const factory	= new FactoryTest({store})
+	const factory = new FactoryTest({ store })
 
 	//$FlowFixMe
-	factory.getDBNote	= () => ({
-		putHashtag		: () => Promise.resolve(true),
-		getDB			: () => ({
+	factory.getDBNote = () => ({
+		putHashtag: () => Promise.resolve(true),
+		getDB: () => ({
 		}),
 	})
 
-	const {HashtagPanel}	= factory.getFactoryComponent()
+	const { HashtagPanel } = factory.getFactoryComponent()
 
-	const createHashtag = async (hashtag : Hashtag) : Promise<boolean> => {
+	const createHashtag = async (hashtag: Hashtag): Promise<boolean> => {
 		return true
 	}
-	stories.add('HashtagPanel',() =>
+	stories.add('HashtagPanel', () =>
 		<Container
 			store={store}
 			factory={factory}
@@ -196,24 +196,24 @@ const stories	= storiesOf('Hashtag', module)
 /* HashtagPanelLots */
 //{{{
 {
-	const Test	= () => {
-		const words		= require('../temp/words.js').words
-		const hashtags		= words.map(word => new Hashtag(word))
-		const store		= getStore({},{
+	const Test = () => {
+		const words = require('../temp/words.js').words
+		const hashtags = words.map(word => new Hashtag(word))
+		const store = getStore({}, {
 			hashtags,
 		})
-		const factory		= new FactoryTest({store})
-		const {HashtagPanel}		= factory.getFactoryComponent()
+		const factory = new FactoryTest({ store })
+		const { HashtagPanel } = factory.getFactoryComponent()
 		return (
 			<Container
 				factory={factory}
 			>
-				<HashtagPanel/>
+				<HashtagPanel />
 			</Container>
 		)
 	}
 	stories.add('HashtagPanelLogs', () =>
-		<Test/>
+		<Test />
 	)
 }
 //}}}
@@ -221,80 +221,80 @@ const stories	= storiesOf('Hashtag', module)
 /* The single hashtag detail in hashtag panel */
 {
 	//{{{
-	class Test extends React.Component<{},{
-		isReady		: boolean,
-		hashtag		: ?Hashtag,
+	class Test extends React.Component<{}, {
+		isReady: boolean,
+		hashtag: ?Hashtag,
 	}>{
-		store		: any
-		factory		: any
-		constructor(props : any){
+		store: any
+		factory: any
+		constructor(props: any) {
 			super(props)
-			this.state		= {
-				isReady		: false,
-				hashtag		: undefined,
+			this.state = {
+				isReady: false,
+				hashtag: undefined,
 			}
 		}
-		componentDidMount(){
+		componentDidMount() {
 			this.load()
 		}
 
 		load = async () => {
-			const hashtag	= new Hashtag('Test')
+			const hashtag = new Hashtag('Test')
 			//add some alias/trigger
 			hashtag.addTrigger('TriggerA')
 			hashtag.addTrigger('TriggerB')
 			hashtag.addTrigger('TriggerC')
 			{
-				const alias		= new HashtagAlias()
+				const alias = new HashtagAlias()
 				alias.setName('AliasA')
 				hashtag.addAlias(alias)
 			}
 			{
-				const alias		= new HashtagAlias()
+				const alias = new HashtagAlias()
 				alias.setName('AliasB')
 				hashtag.addAlias(alias)
 			}
 			{
-				const alias		= new HashtagAlias()
+				const alias = new HashtagAlias()
 				alias.setName('AliasC')
 				hashtag.addAlias(alias)
 			}
-			const note		= new Note()
+			const note = new Note()
 			note.setContent('This is definition')
 			await hashtag.setAvatar(require('../temp/images.js').imageLink, 100, 100)
 			hashtag.setDefinition(note)
-			this.store		= getStore({},{
-				hashtags		: [hashtag],
+			this.store = getStore({}, {
+				hashtags: [hashtag],
 			})
-			this.factory	= new FactoryTest({store : this.store})
+			this.factory = new FactoryTest({ store: this.store })
 			this.setState({
 				hashtag,
-				isReady		: true,
+				isReady: true,
 			})
 		}
 
-		render(){
-			if(this.state.isReady){
-				const {HashtagDetail}	= this.factory.getFactoryComponent()
+		render() {
+			if (this.state.isReady) {
+				const { HashtagDetail } = this.factory.getFactoryComponent()
 				return (
-					<Container 
+					<Container
 						store={this.store}
 						factory={this.factory}
 					>
 						<div className='dark-style main-content-notes'>
-							<HashtagDetail 
+							<HashtagDetail
 								hashtagId={this.state.hashtag && this.state.hashtag._id}
 							/>
 						</div>
 					</Container>
 				)
-			}else{
+			} else {
 				return <div>loading...</div>
 			}
 		}
 	}
-	stories.add('HashtagPanelHashtagDetail',() => 
-		<Test/>
+	stories.add('HashtagPanelHashtagDetail', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -305,36 +305,36 @@ const stories	= storiesOf('Hashtag', module)
  */
 {
 	//{{{
-	const Test		= () => {
-		const {Hashtag : HashtagComponent}		= require('../component/Hashtag.js')
-		const hashtag		= new Hashtag('Midinote')
-		const getAvatarModel		= () => ({
-			getSrc		: (a)		=> a,
+	const Test = () => {
+		const { Hashtag: HashtagComponent } = require('../component/Hashtag.js')
+		const hashtag = new Hashtag('Midinote')
+		const getAvatarModel = () => ({
+			getSrc: (a) => a,
 		})
-		const hashtagAvatar		= new Hashtag('Midinote')
-		hashtagAvatar.avatar		= require('../temp/imageLogo.js').image
-		hashtagAvatar.avatarSize		= {
-			height		: 64,
-			width		: 64,
+		const hashtagAvatar = new Hashtag('Midinote')
+		hashtagAvatar.avatar = require('../temp/imageLogo.js').image
+		hashtagAvatar.avatarSize = {
+			height: 64,
+			width: 64,
 		}
-		hashtagAvatar.displayType		= 'text_icon'
-		const hashtagAvatarB		= new Hashtag('Midinote')
-		hashtagAvatarB.avatar		= require('../temp/imageLogo.js').image
-		hashtagAvatarB.avatarSize		= {
-			height		: 64,
-			width		: 64,
+		hashtagAvatar.displayType = 'text_icon'
+		const hashtagAvatarB = new Hashtag('Midinote')
+		hashtagAvatarB.avatar = require('../temp/imageLogo.js').image
+		hashtagAvatarB.avatarSize = {
+			height: 64,
+			width: 64,
 		}
-		hashtagAvatarB.displayType		= 'icon'
+		hashtagAvatarB.displayType = 'icon'
 		return (
 			<div
 				className='dark-style'
 				style={{
-					height		: 400,
+					height: 400,
 				}}
 			>
 				<h1
 					style={{
-						color		: 'white',
+						color: 'white',
 					}}
 				>
 					This story is hashtag shown in breadcrumbs on the top of the app
@@ -360,8 +360,8 @@ const stories	= storiesOf('Hashtag', module)
 			</div>
 		)
 	}
-	stories.add('HashtagBreadcrumbs', () => 
-		<Test/>
+	stories.add('HashtagBreadcrumbs', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -369,14 +369,14 @@ const stories	= storiesOf('Hashtag', module)
 /* hashtag which appearance is icon */
 {
 	//{{{
-	const hashtag	= new Hashtag('icon')
-	hashtag.avatar	= require('../temp/images.js').imageLink
-	hashtag.displayType	= 'icon'
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = new Hashtag('icon')
+	hashtag.avatar = require('../temp/images.js').imageLink
+	hashtag.displayType = 'icon'
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	stories.add('HashtagIcon',() => 
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	stories.add('HashtagIcon', () =>
 		<Container
 			store={store}
 			factory={factory}
@@ -398,16 +398,16 @@ const stories	= storiesOf('Hashtag', module)
  * */
 {
 	//{{{
-	const note		= new Note()
-	const hashtagQuote	= 
-			Hashtag.SPECIAL_HASHTAGS.quote.build()
-	const store		= getStore({},{
-		hashtags	: [
+	const note = new Note()
+	const hashtagQuote =
+		Hashtag.SPECIAL_HASHTAGS.quote.build()
+	const store = getStore({}, {
+		hashtags: [
 			hashtagQuote,
 		],
 	})
-	const factory	= new FactoryTest({store})
-	const noteHashtag	= new NoteHashtag()
+	const factory = new FactoryTest({ store })
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtagQuote)
 	noteHashtag.setData('This is quote content')
 
@@ -418,15 +418,15 @@ const stories	= storiesOf('Hashtag', module)
 		'this is a line\n',
 	)
 
-	const {NoteEditor}		= factory.getFactoryComponent()
+	const { NoteEditor } = factory.getFactoryComponent()
 
-	stories.add('ViewerBlock',() => 
+	stories.add('ViewerBlock', () =>
 		<Container
 			store={store}
 		>
 			<div className='temp-story-container'>
-				<NoteEditor  
-					note={note}				
+				<NoteEditor
+					note={note}
 					autoSaverEnabled={false}
 				/>
 			</div>
@@ -438,20 +438,20 @@ const stories	= storiesOf('Hashtag', module)
 /* Quote hashtag */
 {
 	//{{{
-	const hashtag		= Hashtag.SPECIAL_HASHTAGS.quote.build()
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.quote.build()
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
 	noteHashtag.setData('This is quote, this is quote, this is quote, this is quote, this is quote, this is quote.')
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	const {ViewerQuote}		= factory.getFactoryComponent()
-	stories.add('QuoteTextArea',() => 
-		<div 
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	const { ViewerQuote } = factory.getFactoryComponent()
+	stories.add('QuoteTextArea', () =>
+		<div
 			className='temp-story-container'>
-			<ViewerQuote 
+			<ViewerQuote
 				noteHashtag={noteHashtag}
 				readOnly={false}
-				value='TEST'/>
+				value='TEST' />
 		</div>
 	)
 	//}}}
@@ -460,20 +460,20 @@ const stories	= storiesOf('Hashtag', module)
 /* Code hashtag */
 {
 	//{{{
-	const hashtag		= Hashtag.SPECIAL_HASHTAGS.code.build()
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.code.build()
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
 	noteHashtag.setData(
-`var a = 12
+		`var a = 12
 var c = a + 20
 `)
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	const {ViewerCode}		= factory.getFactoryComponent()
-	stories.add('ViewerCode',() => 
-		<div 
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	const { ViewerCode } = factory.getFactoryComponent()
+	stories.add('ViewerCode', () =>
+		<div
 			className='temp-story-container'>
-			<ViewerCode 
+			<ViewerCode
 				noteHashtag={noteHashtag}
 				readOnly={false}
 			/>
@@ -485,23 +485,23 @@ var c = a + 20
 /* Todo */
 {
 	//{{{
-	const hashtag		= Hashtag.SPECIAL_HASHTAGS.todo.build()
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.todo.build()
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
 	noteHashtag.setData(1)
 
-	stories.add('Todo',() =>
+	stories.add('Todo', () =>
 		<div className='dark-style main-content-notes' >
 			<pre>
-				This is content 
+				This is content
 				{/*$FlowFixMe*/}
-				<ViewerTodo 
+				<ViewerTodo
 					noteHashtag={noteHashtag}
 					noteEditorComponent={undefined}
 				>
 					{hashtag.getTextDisplay()}
 				</ViewerTodo>
-				content content 
+				content content
 			</pre>
 		</div>
 	)
@@ -511,13 +511,13 @@ var c = a + 20
 /* pic */
 {
 	//{{{
-	const Test		= () => {
-		const factory		= new FactoryTest()
-		const hashtag		= Hashtag.SPECIAL_HASHTAGS.pic.build()
-		const noteHashtag	= new NoteHashtag()
+	const Test = () => {
+		const factory = new FactoryTest()
+		const hashtag = Hashtag.SPECIAL_HASHTAGS.pic.build()
+		const noteHashtag = new NoteHashtag()
 		noteHashtag.setHashtag(hashtag)
-		const note		= new Note()
-		const attachment	= new Attachment(
+		const note = new Note()
+		const attachment = new Attachment(
 			note._id,
 			utils.convertDataURLToBlob(require('../temp/imageHitler.js').imageHitler),
 			'image/jpeg',
@@ -525,11 +525,11 @@ var c = a + 20
 		noteHashtag.setData(attachment.getAttachmentRef())
 		//mock db
 		////$FlowFixMe
-		factory.getNoteModel		= () => ({
-			getAttachment		: () => Promise.resolve(attachment.blob),
+		factory.getNoteModel = () => ({
+			getAttachment: () => Promise.resolve(attachment.blob),
 		})
 		//the component
-		const {ViewerPic}		= factory.getFactoryComponent()
+		const { ViewerPic } = factory.getFactoryComponent()
 		return (
 			<Container
 				factory={factory}
@@ -542,8 +542,8 @@ var c = a + 20
 			</Container>
 		)
 	}
-	stories.add('Pic',() => 
-		<Test/>
+	stories.add('Pic', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -551,14 +551,14 @@ var c = a + 20
 /* pic max */
 //{{{
 {
-	const {Max}		= require('../component/ViewerPic.js')
+	const { Max } = require('../component/ViewerPic.js')
 	//mock
-	const factoryComponent	: any	= {
-		AttachmentPicture		: () => <img 
+	const factoryComponent: any = {
+		AttachmentPicture: () => <img
 			src={require('../temp/imageHitler.js').imageHitler}
 		/>,
 	}
-	const Test		= () => {
+	const Test = () => {
 		return (//$FlowFixMe
 			<Max
 				factoryComponent={factoryComponent}
@@ -567,7 +567,7 @@ var c = a + 20
 		)
 	}
 	stories.add('PicMax', () =>
-		<Test/>
+		<Test />
 	)
 }
 //}}}
@@ -576,11 +576,11 @@ var c = a + 20
 /* pic big */
 {
 	//{{{
-	const hashtag		= Hashtag.SPECIAL_HASHTAGS.pic.build()
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.pic.build()
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
 	noteHashtag.setData(require('../temp/imageGit.js').image)
-	stories.add('PicBig',() => 
+	stories.add('PicBig', () =>
 		<div className='temp-story-container'>
 			{/*$FlowFixMe*/}
 			<ViewerPic
@@ -594,18 +594,18 @@ var c = a + 20
 /* attachment picture */
 {
 	//{{{
-	const Test		= () => {
-		const store		= getStore()
-		const factory		= new FactoryTest({})
+	const Test = () => {
+		const store = getStore()
+		const factory = new FactoryTest({})
 		//$FlowFixMe
-		factory.getNoteModel		= () => ({
-			getAttachment		: () => new Promise(resolve => {
+		factory.getNoteModel = () => ({
+			getAttachment: () => new Promise(resolve => {
 				setTimeout(() => {
 					resolve(utils.convertDataURLToBlob(require('../temp/imageGit.js').image))
-				},2000)
+				}, 2000)
 			}),
 		})
-		const {AttachmentPicture}		= factory.getFactoryComponent()
+		const { AttachmentPicture } = factory.getFactoryComponent()
 
 		return (
 			<Container
@@ -622,7 +622,7 @@ var c = a + 20
 		)
 	}
 	stories.add('AttachmentPicture', () =>
-		<Test/>
+		<Test />
 	)
 	//}}}
 }
@@ -630,11 +630,11 @@ var c = a + 20
 /* pic load on scroll */
 {
 	//{{{
-	const hashtag		= Hashtag.SPECIAL_HASHTAGS.pic.build()
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.pic.build()
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
 	noteHashtag.setData(require('../temp/imageHitler.js').imageHitler)
-	stories.add('PicLoadOnScroll',() => 
+	stories.add('PicLoadOnScroll', () =>
 		<div className='temp-story-container'>
 			{/*$FlowFixMe*/}
 			<ViewerPic
@@ -649,19 +649,19 @@ var c = a + 20
 /* Hashtag out of note , just for show, like in the navigator */
 {
 	//{{{
-	const hashtag	= new Hashtag('tag')
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	const {Hashtag : HashtagComponent}		= factory.getFactoryComponent()
-	const MyTest	= (props) => {
+	const hashtag = new Hashtag('tag')
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	const { Hashtag: HashtagComponent } = factory.getFactoryComponent()
+	const MyTest = (props) => {
 		return (
 			<HashtagComponent
-					mode='navigator'
-					hashtag={hashtag}
-				/>
+				mode='navigator'
+				hashtag={hashtag}
+			/>
 		)
 	}
-	stories.add('HashtagInNavigator',() => 
+	stories.add('HashtagInNavigator', () =>
 		<Container
 			store={store}
 			factory={factory}
@@ -676,19 +676,19 @@ var c = a + 20
 
 /* hash */
 {
-	const hashtag	= Hashtag.SPECIAL_HASHTAGS.hash.build()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.hash.build()
 
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	const {Hashtag  : HashtagComponent}		= factory.getFactoryComponent()
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	const { Hashtag: HashtagComponent } = factory.getFactoryComponent()
 	//{{{
-	stories.add('Hash',() =>
+	stories.add('Hash', () =>
 		<Container
 			store={store}
 			factory={factory}
 		>
 			<div className='dark-style main-content-notes' >
-				<HashtagComponent 
+				<HashtagComponent
 					mode='navigator'
 					hashtag={hashtag}
 				/>
@@ -702,11 +702,11 @@ var c = a + 20
 /* midilink */
 {
 	//{{{
-	const hashtag	= Hashtag.SPECIAL_HASHTAGS.Midilink.build()
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	const {Hashtag  : HashtagComponent}		= factory.getFactoryComponent()
-	stories.add('Midilink',() => 
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.Midilink.build()
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	const { Hashtag: HashtagComponent } = factory.getFactoryComponent()
+	stories.add('Midilink', () =>
 		<Container
 			store={store}
 			factory={factory}
@@ -727,16 +727,16 @@ var c = a + 20
  * */
 {
 	//{{{
-	const hashtag	= Hashtag.SPECIAL_HASHTAGS.Midilink.build()
-	const hashtagTarget	= new Hashtag('Somewhere')
-	const position		= Position.buildByHashtagId(hashtagTarget._id)
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.Midilink.build()
+	const hashtagTarget = new Hashtag('Somewhere')
+	const position = Position.buildByHashtagId(hashtagTarget._id)
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
-	noteHashtag.setData([position.format(),'AutoComplete'])
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	const {Hashtag  : HashtagComponent}		= factory.getFactoryComponent()
-	stories.add('MidilinkView',() => 
+	noteHashtag.setData([position.format(), 'AutoComplete'])
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	const { Hashtag: HashtagComponent } = factory.getFactoryComponent()
+	stories.add('MidilinkView', () =>
 		<Container
 			store={store}
 			factory={factory}
@@ -755,32 +755,32 @@ var c = a + 20
 
 /* link edit*/
 //TODO temp close
-if(false){
+if (false) {
 	//{{{
-	const hashtag	= Hashtag.SPECIAL_HASHTAGS.Midilink.build()
-	const hashtagTarget	= new Hashtag('Somewhere')
-	const position		= Position.buildByHashtagId(hashtagTarget._id)
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.Midilink.build()
+	const hashtagTarget = new Hashtag('Somewhere')
+	const position = Position.buildByHashtagId(hashtagTarget._id)
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
-	noteHashtag.setData([position.format(),'AutoComplete'])
-	const note		= new Note()
-	note.setContent('test',noteHashtag)
+	noteHashtag.setData([position.format(), 'AutoComplete'])
+	const note = new Note()
+	note.setContent('test', noteHashtag)
 	noteHashtag.setNote(note)
-	const text			= hashtag.getTextDisplay(noteHashtag.data).replace(/\s/g,'&nbsp;')
-	const factoryMock	= {
-		getNavigatorModel	: () => ({
-			visitHashtagCurrentAnchorNoteId	: () => {},
-			visitHashtag	: () => {},
-			save	: () => Promise.resolve(true),
+	const text = hashtag.getTextDisplay(noteHashtag.data).replace(/\s/g, '&nbsp;')
+	const factoryMock = {
+		getNavigatorModel: () => ({
+			visitHashtagCurrentAnchorNoteId: () => { },
+			visitHashtag: () => { },
+			save: () => Promise.resolve(true),
 		}),
-		getNoteModel	: () => ({
-			loadDocument	: () => Promise.resolve(true),
+		getNoteModel: () => ({
+			loadDocument: () => Promise.resolve(true),
 		}),
 	}
-	const store		= getStore()
-	const factory	= new FactoryTest({store})
-	const {Hashtag  : HashtagComponent}		= factory.getFactoryComponent()
-	stories.add('MidilinkEdit',() => 
+	const store = getStore()
+	const factory = new FactoryTest({ store })
+	const { Hashtag: HashtagComponent } = factory.getFactoryComponent()
+	stories.add('MidilinkEdit', () =>
 		<Container
 			factory={factory}
 			store={store}
@@ -792,7 +792,7 @@ if(false){
 					noteHashtag={noteHashtag}
 					note={note}
 				>
-					<span dangerouslySetInnerHTML={{__html : text}}></span>
+					<span dangerouslySetInnerHTML={{ __html: text }}></span>
 				</HashtagComponent>
 			</div>
 		</Container>
@@ -807,70 +807,70 @@ if(false){
  * */
 {
 	//{{{
-	const hashtag	= Hashtag.SPECIAL_HASHTAGS.Midilink.build()
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.Midilink.build()
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
-	const note		= new Note()
-	note.setContent('test',noteHashtag)
+	const note = new Note()
+	note.setContent('test', noteHashtag)
 	noteHashtag.setNote(note)
-	const factoryMock	= {
-		getNavigatorModel	: () => ({
-			visitHashtagCurrentAnchorNoteId	: () => {},
-			visitHashtag	: () => {},
-			save	: () => Promise.resolve(true),
+	const factoryMock = {
+		getNavigatorModel: () => ({
+			visitHashtagCurrentAnchorNoteId: () => { },
+			visitHashtag: () => { },
+			save: () => Promise.resolve(true),
 		}),
-		getNoteModel	: () => ({
-			loadDocument	: () => Promise.resolve(true),
+		getNoteModel: () => ({
+			loadDocument: () => Promise.resolve(true),
 		}),
 	}
-	const hashtagA	= new Hashtag('hashtagA')
-	const hashtagB	= new Hashtag('hashtagB')
-	const store		= getStore({
-		hashtagByIds	: {
-			[hashtagA._id]	: hashtagA,
-			[hashtagB._id]	: hashtagB,
+	const hashtagA = new Hashtag('hashtagA')
+	const hashtagB = new Hashtag('hashtagB')
+	const store = getStore({
+		hashtagByIds: {
+			[hashtagA._id]: hashtagA,
+			[hashtagB._id]: hashtagB,
 		},
 	})
-	const factory	= new FactoryTest({store})
-	const {Hashtag  : HashtagComponent, HashtagDataSetting}		= factory.getFactoryComponent()
-	class Test extends React.Component<{},{}>{
-		constructor(props){
+	const factory = new FactoryTest({ store })
+	const { Hashtag: HashtagComponent, HashtagDataSetting } = factory.getFactoryComponent()
+	class Test extends React.Component<{}, {}>{
+		constructor(props) {
 			super(props)
 		}
 
-		refresh(){
+		refresh() {
 			//{{{
-			const label		= 'Test.refresh'
+			const label = 'Test.refresh'
 			this.forceUpdate()
-			log.debug('%s:',label)
+			log.debug('%s:', label)
 			//}}}
 		}
 
-		render(){
-			const label		= 'Test.render'
-			log.debug('%s:',label)
-			const text			= hashtag.getTextDisplay(noteHashtag.data).replace(/\s/g,'&nbsp;')
-			return(
-			<HashtagComponent
-				mode='editor'
-				hashtag={hashtag}
-				noteHashtag={noteHashtag}
-				note={note}
-				noteEditorComponent={this}
-			>
-			</HashtagComponent>
+		render() {
+			const label = 'Test.render'
+			log.debug('%s:', label)
+			const text = hashtag.getTextDisplay(noteHashtag.data).replace(/\s/g, '&nbsp;')
+			return (
+				<HashtagComponent
+					mode='editor'
+					hashtag={hashtag}
+					noteHashtag={noteHashtag}
+					note={note}
+					noteEditorComponent={this}
+				>
+				</HashtagComponent>
 			)
 		}
 	}
 
-	stories.add('MidklinkEditEmpty',() => 
+	stories.add('MidklinkEditEmpty', () =>
 		<Container
 			store={store}
 			factory={factory}
 		>
 			<div className='dark-style main-content-notes'>
-				<Test/>
-				<HashtagDataSetting/>
+				<Test />
+				<HashtagDataSetting />
 			</div>
 		</Container>
 	)
@@ -884,70 +884,70 @@ if(false){
  */
 {
 	//{{{
-	const hashtag	= Hashtag.SPECIAL_HASHTAGS.link.build()
-	const noteHashtag	= new NoteHashtag()
+	const hashtag = Hashtag.SPECIAL_HASHTAGS.link.build()
+	const noteHashtag = new NoteHashtag()
 	noteHashtag.setHashtag(hashtag)
-	const note		= new Note()
-	note.setContent('test',noteHashtag)
+	const note = new Note()
+	note.setContent('test', noteHashtag)
 	noteHashtag.setNote(note)
-	const factoryMock	= {
-		getNavigatorModel	: () => ({
-			visitHashtagCurrentAnchorNoteId	: () => {},
-			visitHashtag	: () => {},
-			save	: () => Promise.resolve(true),
+	const factoryMock = {
+		getNavigatorModel: () => ({
+			visitHashtagCurrentAnchorNoteId: () => { },
+			visitHashtag: () => { },
+			save: () => Promise.resolve(true),
 		}),
-		getNoteModel	: () => ({
-			loadDocument	: () => Promise.resolve(true),
+		getNoteModel: () => ({
+			loadDocument: () => Promise.resolve(true),
 		}),
 	}
-	const hashtagA	= new Hashtag('hashtagA')
-	const hashtagB	= new Hashtag('hashtagB')
-	const store		= getStore({
-		hashtagByIds	: {
-			[hashtagA._id]	: hashtagA,
-			[hashtagB._id]	: hashtagB,
+	const hashtagA = new Hashtag('hashtagA')
+	const hashtagB = new Hashtag('hashtagB')
+	const store = getStore({
+		hashtagByIds: {
+			[hashtagA._id]: hashtagA,
+			[hashtagB._id]: hashtagB,
 		},
 	})
-	const factory	= new FactoryTest({store})
-	const {Hashtag  : HashtagComponent, HashtagDataSetting }		= factory.getFactoryComponent()
-	class Test extends React.Component<{},{}>{
-		constructor(props){
+	const factory = new FactoryTest({ store })
+	const { Hashtag: HashtagComponent, HashtagDataSetting } = factory.getFactoryComponent()
+	class Test extends React.Component<{}, {}>{
+		constructor(props) {
 			super(props)
 		}
 
-		refresh(){
+		refresh() {
 			//{{{
-			const label		= 'Test.refresh'
+			const label = 'Test.refresh'
 			this.forceUpdate()
-			log.debug('%s:',label)
+			log.debug('%s:', label)
 			//}}}
 		}
 
-		render(){
-			const label		= 'Test.render'
-			log.debug('%s:',label)
-			const text			= hashtag.getTextDisplay(noteHashtag.data).replace(/\s/g,'&nbsp;')
-			return(
-			<HashtagComponent
-				mode='editor'
-				hashtag={hashtag}
-				noteHashtag={noteHashtag}
-				note={note}
-				noteEditorComponent={this}
-			>
-			</HashtagComponent>
+		render() {
+			const label = 'Test.render'
+			log.debug('%s:', label)
+			const text = hashtag.getTextDisplay(noteHashtag.data).replace(/\s/g, '&nbsp;')
+			return (
+				<HashtagComponent
+					mode='editor'
+					hashtag={hashtag}
+					noteHashtag={noteHashtag}
+					note={note}
+					noteEditorComponent={this}
+				>
+				</HashtagComponent>
 			)
 		}
 	}
 
-	stories.add('LinkEditEmpty',() => 
+	stories.add('LinkEditEmpty', () =>
 		<Container
 			store={store}
 			factory={factory}
 		>
 			<div className='dark-style main-content-notes'>
-				<Test/>
-				<HashtagDataSetting/>
+				<Test />
+				<HashtagDataSetting />
 			</div>
 		</Container>
 	)
@@ -958,15 +958,15 @@ if(false){
  * To test link hashtag
  */
 {
-	const Test		= () => {
-		const hashtagLink		= Hashtag.SPECIAL_HASHTAGS.link.build()
-		const noteHashtag		= new NoteHashtag()
+	const Test = () => {
+		const hashtagLink = Hashtag.SPECIAL_HASHTAGS.link.build()
+		const noteHashtag = new NoteHashtag()
 		noteHashtag.setHashtag(hashtagLink)
-		const store		= getStore({},{
+		const store = getStore({}, {
 			hashtagLink
 		})
-		const factory		= new FactoryTest({store})
-		const {Hashtag : HashtagComponent}		= factory.getFactoryComponent()
+		const factory = new FactoryTest({ store })
+		const { Hashtag: HashtagComponent } = factory.getFactoryComponent()
 		return (
 			<Container
 				factory={factory}
@@ -980,8 +980,8 @@ if(false){
 			</Container>
 		)
 	}
-	stories.add('link', () => 
-		<Test/>
+	stories.add('link', () =>
+		<Test />
 	)
 }
 
@@ -991,13 +991,13 @@ if(false){
  */
 {
 	//{{{
-	const Test		= () => {
-		const factory		= new FactoryTest()
-		const {HashtagDataSetting}		= factory.getFactoryComponent()
-		const hashtagLink		= Hashtag.SPECIAL_HASHTAGS.link.build()
-		const noteHashtag		= new NoteHashtag()
+	const Test = () => {
+		const factory = new FactoryTest()
+		const { HashtagDataSetting } = factory.getFactoryComponent()
+		const hashtagLink = Hashtag.SPECIAL_HASHTAGS.link.build()
+		const noteHashtag = new NoteHashtag()
 		noteHashtag.setHashtag(hashtagLink)
-		return(
+		return (
 			<Container
 				factory={factory}
 			>
@@ -1010,7 +1010,7 @@ if(false){
 		)
 	}
 	stories.add('HashtagDataSetting', () =>
-		<Test/>
+		<Test />
 	)
 	//}}}
 }
@@ -1039,24 +1039,24 @@ if(false){
 /* HashtagSetting */
 {
 	//{{{
-	const Test		= () => {
-		const hashtag		= new Hashtag('dean')
-		const store		= getStore({},{
-			hashtags	: [hashtag],
+	const Test = () => {
+		const hashtag = new Hashtag('dean')
+		const store = getStore({}, {
+			hashtags: [hashtag],
 		})
-		const factory		= new FactoryTest({store})
+		const factory = new FactoryTest({ store })
 		//$FlowFixMe
-		factory.getDBNote		= () => ({
-			getNotes		: () => Promise.resolve([new Note()]),
-			putHashtag		: async () => {
+		factory.getDBNote = () => ({
+			getNotes: () => Promise.resolve([new Note()]),
+			putHashtag: async () => {
 				await utils.sleep(4000)
 				return true
 			},
 		})
-		const hashtagModel		= factory.getHashtagModel()
-		const {HashtagSetting}		= factory.getFactoryComponent()
+		const hashtagModel = factory.getHashtagModel()
+		const { HashtagSetting } = factory.getFactoryComponent()
 		return (
-			<Container 
+			<Container
 				factory={factory}
 			>
 				<div className='dark-style main-content-notes' >
@@ -1067,13 +1067,13 @@ if(false){
 								hashtag._id
 							))}
 					>SET</button>
-					<HashtagSetting/>
+					<HashtagSetting />
 				</div>
 			</Container>
 		)
 	}
 
-	stories.add('HashtagSetting',() => 
+	stories.add('HashtagSetting', () =>
 		<Test />
 	)
 	//}}}
@@ -1083,32 +1083,32 @@ if(false){
 {
 	//{{{
 	const factoryMock = {
-		components	: {
-			Hashtag		: (props) => <div>{props.hashtagId}</div>,
+		components: {
+			Hashtag: (props) => <div>{props.hashtagId}</div>,
 		}
 	}
 
-	const Test		= () => {
-		const hashtags	= [new Hashtag('tagA'),new Hashtag('tagB'),new Hashtag('tagC')]
-		const store		= getStore({
-			setting		: {
-				spellCheck		: true,
+	const Test = () => {
+		const hashtags = [new Hashtag('tagA'), new Hashtag('tagB'), new Hashtag('tagC')]
+		const store = getStore({
+			setting: {
+				spellCheck: true,
 			}
-		},{
+		}, {
 			hashtags,
 		})
-		const factory		= new FactoryTest({store})
-		log.warn('the store:',factory.getStore().getState())
-		const searchHashtag	= (keyword : string) : Array<Hashtag> => {
+		const factory = new FactoryTest({ store })
+		log.warn('the store:', factory.getStore().getState())
+		const searchHashtag = (keyword: string): Array<Hashtag> => {
 			return hashtags.filter(hashtag => {
-				if(hashtag.name.indexOf(keyword) >= 0){
+				if (hashtag.name.indexOf(keyword) >= 0) {
 					return true
-				}else{
+				} else {
 					return false
 				}
 			})
 		}
-		const {HashtagNameSetting}		= factory.getFactoryComponent()
+		const { HashtagNameSetting } = factory.getFactoryComponent()
 		return (
 			<div className='tag-setting-dialog-wrapper position-relative' >
 				<Container
@@ -1116,7 +1116,7 @@ if(false){
 				>
 					<HashtagNameSetting
 						name='oldName'
-						onOK={(name) => log.debug('to change hashtag name:',name)}
+						onOK={(name) => log.debug('to change hashtag name:', name)}
 						onBack={() => log.debug('MOCK on back')}
 						searchHashtag={searchHashtag}
 					/>
@@ -1124,8 +1124,8 @@ if(false){
 			</div>
 		)
 	}
-	stories.add('HashtagSettingName',() => 
-		<Test/>
+	stories.add('HashtagSettingName', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -1133,24 +1133,24 @@ if(false){
 /* HashtagSettingTrigger */
 {
 	//{{{
-	const Test		= () => {
-		const hashtag	= new Hashtag('tag')
+	const Test = () => {
+		const hashtag = new Hashtag('tag')
 		hashtag.addTrigger('triggerA')
 		hashtag.addTrigger('triggerB')
-		const {HashtagTriggerSetting}		= require('../component/HashtagSetting.js')
+		const { HashtagTriggerSetting } = require('../component/HashtagSetting.js')
 		return (
 			<div className='tag-setting-dialog-wrapper position-relative' >
 				{/*$FlowFixMe*/}
 				<HashtagTriggerSetting
 					spellCheck={false}
 					hashtag={hashtag}
-					onBack={() => {}}
+					onBack={() => { }}
 				/>
 			</div>
 		)
 	}
-	stories.add('HashtagSettingTrigger',() =>
-		<Test/>
+	stories.add('HashtagSettingTrigger', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -1158,28 +1158,28 @@ if(false){
 /* HashtagSettingAlias */
 {
 	//{{{
-	const Test		= () => {
-		const hashtag	= new Hashtag('tag')
-		const store		= getStore({},{
-			hashtags	: [hashtag],
+	const Test = () => {
+		const hashtag = new Hashtag('tag')
+		const store = getStore({}, {
+			hashtags: [hashtag],
 		})
-		const factory	= new FactoryTest({store})
-		const {HashtagAliasSetting}		= factory.getFactoryComponent()
-			return(
-				<Container
-					factory={factory}
-				>
-					<div className='tag-setting-dialog-wrapper position-relative' >
-						<HashtagAliasSetting 
-							hashtag={hashtag}		 
-						/>
-					</div>
-				</Container>
-			)
+		const factory = new FactoryTest({ store })
+		const { HashtagAliasSetting } = factory.getFactoryComponent()
+		return (
+			<Container
+				factory={factory}
+			>
+				<div className='tag-setting-dialog-wrapper position-relative' >
+					<HashtagAliasSetting
+						hashtag={hashtag}
+					/>
+				</div>
+			</Container>
+		)
 	}
 
-	stories.add('hashtagSettingAlias',() => 
-		<Test/>
+	stories.add('hashtagSettingAlias', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -1187,19 +1187,19 @@ if(false){
 /* HashtagSettingAvatarDialog */
 {
 	//{{{
-	const Test		= () => {
-		const AvatarDialog	= require('../component/HashtagSetting.js').AvatarDialogConnected
+	const Test = () => {
+		const AvatarDialog = require('../component/HashtagSetting.js').AvatarDialogConnected
 
 		return (
 			<Container>
 				<div className='tag-setting-dialog-wrapper position-relative'>
-					<AvatarDialog/>
+					<AvatarDialog />
 				</div>
 			</Container>
 		)
 	}
-	stories.add('HashtagSettingAvatarDialog',() => 
-		<Test/>
+	stories.add('HashtagSettingAvatarDialog', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -1207,18 +1207,18 @@ if(false){
 /* HashtagSettingMergeDialog */
 //{{{
 {
-	const Test		= () => {
-		const hashtag		= new Hashtag('ToBeMerge')
-		const hashtagB		= new Hashtag('ToMerge')
-		const store		= getStore({},{
-			hashtags		: [hashtag, hashtagB]
+	const Test = () => {
+		const hashtag = new Hashtag('ToBeMerge')
+		const hashtagB = new Hashtag('ToMerge')
+		const store = getStore({}, {
+			hashtags: [hashtag, hashtagB]
 		})
-		const factory		= new FactoryTest({store})
+		const factory = new FactoryTest({ store })
 		//$FlowFixMe
-		factory.getHashtagSetting		= () => ({
-			merge		: () => Promise.resolve({result : true}),
+		factory.getHashtagSetting = () => ({
+			merge: () => Promise.resolve({ result: true }),
 		})
-		const {MergeDialogConnected}		= require('../component/HashtagSetting.js')
+		const { MergeDialogConnected } = require('../component/HashtagSetting.js')
 		return (
 			<Container
 				factory={factory}
@@ -1231,7 +1231,7 @@ if(false){
 	}
 	stories.add('HashtagSettingMergeDialog', () =>
 		<div className='tag-setting-dialog-wrapper position-relative'>
-			<Test/>
+			<Test />
 		</div>
 	)
 }
@@ -1242,41 +1242,41 @@ if(false){
  * is similar to the note editor */
 {
 	//{{{
-	const hashtag	= new Hashtag('tag')
-	const note		= new Note()
+	const hashtag = new Hashtag('tag')
+	const note = new Note()
 	note.setContent('test definition')
-	const store		= getStore({},{
-		hashtags	: [hashtag,new Hashtag('tagT')]
+	const store = getStore({}, {
+		hashtags: [hashtag, new Hashtag('tagT')]
 	})
 	hashtag.setDefinition(note)
-	const factory	= new FactoryTest({store})
-	const {DefinitionEditor, AutoComplete }		= factory.getFactoryComponent()
+	const factory = new FactoryTest({ store })
+	const { DefinitionEditor, AutoComplete } = factory.getFactoryComponent()
 
-	class Test extends React.Component<{},{
-		definition	: Note,
+	class Test extends React.Component<{}, {
+		definition: Note,
 	}>{
-		ref	: any
-		constructor(props){
+		ref: any
+		constructor(props) {
 			super(props)
-			this.state	= {
-				definition	: hashtag.getDefinition(),
+			this.state = {
+				definition: hashtag.getDefinition(),
 			}
 		}
 
-		render(){
+		render() {
 			return (
 				<div>
-					<DefinitionEditor 
+					<DefinitionEditor
 						ref={r => this.ref = r}
 						note={hashtag.getDefinition()}
 						autoCompleteEnabled={true}
-						modifyNote={() => {}}
+						modifyNote={() => { }}
 					/>
-					<AutoComplete/>
+					<AutoComplete />
 					<button
 						onClick={() => {
 							log.debug(
-								'The definition:', 
+								'The definition:',
 								this.ref.getWrappedInstance().getNote()
 							)
 						}}
@@ -1286,13 +1286,13 @@ if(false){
 		}
 	}
 
-	stories.add('DefinitionEditor',() => 
+	stories.add('DefinitionEditor', () =>
 		<Container
 			store={store}
 			factory={factory}
 		>
 			<div className='dark-style main-content-notes' >
-				<Test/>
+				<Test />
 			</div>
 		</Container>
 	)
@@ -1303,25 +1303,25 @@ if(false){
 /* Definition viewer */
 {
 	//{{{
-	const hashtag	= new Hashtag('tag')
-	const note		= new Note()
-	const hashtagA	= new Hashtag('tagA')
-	note.setContent('This is a tag of:',hashtagA)
+	const hashtag = new Hashtag('tag')
+	const note = new Note()
+	const hashtagA = new Hashtag('tagA')
+	note.setContent('This is a tag of:', hashtagA)
 	hashtag.setDefinition(note)
-	const store		= getStore({
-		hashtagByIds	: {
-			[hashtagA._id]	: hashtagA,
-			[hashtag._id]	: hashtag,
+	const store = getStore({
+		hashtagByIds: {
+			[hashtagA._id]: hashtagA,
+			[hashtag._id]: hashtag,
 		}
 	})
-	const factory	= new FactoryTest({store})
-	const {DefinitionViewer}		= factory.getFactoryComponent()
-	stories.add('DefinitionViewer',() =>
+	const factory = new FactoryTest({ store })
+	const { DefinitionViewer } = factory.getFactoryComponent()
+	stories.add('DefinitionViewer', () =>
 		<Container
 			store={store}
 		>
 			<div className='dark-style main-content-notes'>
-				<DefinitionViewer 
+				<DefinitionViewer
 					note={hashtag.getDefinition()}
 				/>
 			</div>
@@ -1333,17 +1333,17 @@ if(false){
 /* Definition summery */
 {
 	//{{{
-	const hashtag	= new Hashtag('tag')
-	const note		= new Note()
-	const hashtagA	= new Hashtag('tagA')
-	note.setContent('This is a tag of:',hashtagA)
+	const hashtag = new Hashtag('tag')
+	const note = new Note()
+	const hashtagA = new Hashtag('tagA')
+	note.setContent('This is a tag of:', hashtagA)
 	hashtag.setDefinition(note)
-	const store		= getStore({},{
-		hashtags	: [hashtag, hashtagA],
+	const store = getStore({}, {
+		hashtags: [hashtag, hashtagA],
 	})
-	const factory		= new FactoryTest({store})
-	const {DefinitionSummary}		= factory.getFactoryComponent()
-	stories.add('DefinitionSummery',() => 
+	const factory = new FactoryTest({ store })
+	const { DefinitionSummary } = factory.getFactoryComponent()
+	stories.add('DefinitionSummery', () =>
 		<Container
 			factory={factory}
 		>
@@ -1352,45 +1352,45 @@ if(false){
 			/>
 		</Container>
 	)
-		
+
 	//}}}
 }
 
 /* doc hashtag */
 {
 	//{{{
-	const Test		= () => {
-		const hashtag		= Hashtag.SPECIAL_HASHTAGS.doc.build()
-		const noteHashtag	= new NoteHashtag()
+	const Test = () => {
+		const hashtag = Hashtag.SPECIAL_HASHTAGS.doc.build()
+		const noteHashtag = new NoteHashtag()
 		noteHashtag.setHashtag(hashtag)
-		const HTML		= 
-		//{{{
-`<div data-contents="true"><h1 class="rdw-start-aligned-block" data-block="true" data-editor="cv8oi" data-offset-key="8d521-0-0"><div data-offset-key="8d521-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="8d521-0-0" style="color: rgb(36, 41, 46); font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Asynchronous Transitions</span></span></div></h1><div class="" data-block="true" data-editor="cv8oi" data-offset-key="1hmnd-0-0"><div data-offset-key="1hmnd-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="1hmnd-0-0" style="color: rgb(36, 41, 46); background-color: rgb(255, 255, 255); font-size: 16px; font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Sometimes, you need to execute some asynchronous code during a state transition and ensure the new state is not entered until your code has completed. A good example of this is when you transition out of a state and want to gradually fade a UI component away, or slide it off the screen, and don't want to transition to the next state until after that animation has completed.</span></span></div></div></div>`
+		const HTML =
+			//{{{
+			`<div data-contents="true"><h1 class="rdw-start-aligned-block" data-block="true" data-editor="cv8oi" data-offset-key="8d521-0-0"><div data-offset-key="8d521-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="8d521-0-0" style="color: rgb(36, 41, 46); font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Asynchronous Transitions</span></span></div></h1><div class="" data-block="true" data-editor="cv8oi" data-offset-key="1hmnd-0-0"><div data-offset-key="1hmnd-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="1hmnd-0-0" style="color: rgb(36, 41, 46); background-color: rgb(255, 255, 255); font-size: 16px; font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Sometimes, you need to execute some asynchronous code during a state transition and ensure the new state is not entered until your code has completed. A good example of this is when you transition out of a state and want to gradually fade a UI component away, or slide it off the screen, and don't want to transition to the next state until after that animation has completed.</span></span></div></div></div>`
 		//}}}
 		/*
 		 * To mock the data of document content
 		 */
-		const factory		= new FactoryTest()
-		factory.getHashtagDocumentModel().setNoteHashtagData(noteHashtag,HTML)
-		log.debug('the summary:%s', 
+		const factory = new FactoryTest()
+		factory.getHashtagDocumentModel().setNoteHashtagData(noteHashtag, HTML)
+		log.debug('the summary:%s',
 			factory.getHashtagDocumentModel().getSummary(noteHashtag)
 		)
-		const {ViewerDoc}	= factory.getFactoryComponent()
-		return(
+		const { ViewerDoc } = factory.getFactoryComponent()
+		return (
 			<Container
 				factory={factory}
 			>
-				<div 
+				<div
 					className='temp-story-container'>
-					<ViewerDoc 
+					<ViewerDoc
 						noteHashtag={noteHashtag}
 					/>
 				</div>
 			</Container>
 		)
 	}
-	stories.add('ViewerDoc',() => 
-		<Test/>
+	stories.add('ViewerDoc', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -1398,42 +1398,42 @@ if(false){
 /* doc editor */
 {
 	//{{{
-	const Test		= () => {
-		const note		= new Note()
-		const tomato		= new Hashtag('tomato')
-		note.setContent('How to use Pomodoro technique?',tomato)
-		const noteHashtag	= new NoteHashtag()
+	const Test = () => {
+		const note = new Note()
+		const tomato = new Hashtag('tomato')
+		note.setContent('How to use Pomodoro technique?', tomato)
+		const noteHashtag = new NoteHashtag()
 		noteHashtag.setNote(note)
-		const store		= getStore({},{
-			hashtags		: [tomato],
-			notes		: [note],
+		const store = getStore({}, {
+			hashtags: [tomato],
+			notes: [note],
 		})
-		const factory	= new FactoryTest({store})
+		const factory = new FactoryTest({ store })
 		//$FlowFixMe
-		factory.getNoteModel().noteUpdate		= () => Promise.resolve(true)
+		factory.getNoteModel().noteUpdate = () => Promise.resolve(true)
 		//The HTML content to set to document
-		const HTML		= 
-		//{{{
-`<div data-contents="true"><h1 class="rdw-start-aligned-block" data-block="true" data-editor="cv8oi" data-offset-key="8d521-0-0"><div data-offset-key="8d521-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="8d521-0-0" style="color: rgb(36, 41, 46); font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Asynchronous Transitions</span></span></div></h1><div class="" data-block="true" data-editor="cv8oi" data-offset-key="1hmnd-0-0"><div data-offset-key="1hmnd-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="1hmnd-0-0" style="color: rgb(36, 41, 46); background-color: rgb(255, 255, 255); font-size: 16px; font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Sometimes, you need to execute some asynchronous code during a state transition and ensure the new state is not entered until your code has completed. A good example of this is when you transition out of a state and want to gradually fade a UI component away, or slide it off the screen, and don't want to transition to the next state until after that animation has completed.</span></span></div></div></div>`
+		const HTML =
+			//{{{
+			`<div data-contents="true"><h1 class="rdw-start-aligned-block" data-block="true" data-editor="cv8oi" data-offset-key="8d521-0-0"><div data-offset-key="8d521-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="8d521-0-0" style="color: rgb(36, 41, 46); font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Asynchronous Transitions</span></span></div></h1><div class="" data-block="true" data-editor="cv8oi" data-offset-key="1hmnd-0-0"><div data-offset-key="1hmnd-0-0" class="public-DraftStyleDefault-block public-DraftStyleDefault-ltr"><span data-offset-key="1hmnd-0-0" style="color: rgb(36, 41, 46); background-color: rgb(255, 255, 255); font-size: 16px; font-family: -apple-system, system-ui, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif, &quot;Apple Color Emoji&quot;, &quot;Segoe UI Emoji&quot;, &quot;Segoe UI Symbol&quot;;"><span data-text="true">Sometimes, you need to execute some asynchronous code during a state transition and ensure the new state is not entered until your code has completed. A good example of this is when you transition out of a state and want to gradually fade a UI component away, or slide it off the screen, and don't want to transition to the next state until after that animation has completed.</span></span></div></div></div>`
 		//}}}
-		factory.getHashtagDocumentModel().setNoteHashtagData(noteHashtag,HTML)
+		factory.getHashtagDocumentModel().setNoteHashtagData(noteHashtag, HTML)
 		/*
 		 * mock the load attachment fn
 		 */
-		const getAttachmentOriginal		= factory.getNoteModel().getAttachment.bind(factory.getNoteModel())
+		const getAttachmentOriginal = factory.getNoteModel().getAttachment.bind(factory.getNoteModel())
 		//$FlowFixMe
-		factory.getNoteModel().getAttachment		= async (...argument) => {
+		factory.getNoteModel().getAttachment = async (...argument) => {
 			await utils.sleep(6000)
 			return getAttachmentOriginal(...argument)
 		}
-		const {ViewerDocEditor}		= factory.getFactoryComponent()
-		return(
+		const { ViewerDocEditor } = factory.getFactoryComponent()
+		return (
 			<Container
 				factory={factory}
 			>
-				<div 
+				<div
 					style={{
-						fontSize	: 14,
+						fontSize: 14,
 					}}
 				>
 					<ViewerDocEditor
@@ -1444,8 +1444,8 @@ if(false){
 		)
 	}
 
-	stories.add('HashtagDocEditor',() =>
-		<Test/>
+	stories.add('HashtagDocEditor', () =>
+		<Test />
 	)
 	//}}}
 }
@@ -1455,25 +1455,25 @@ if(false){
  */
 {
 	//{{{
-	class Test extends React.Component<{},{
-		images		: Array<string>,
-		thumbs		: Array<string>,
+	class Test extends React.Component<{}, {
+		images: Array<string>,
+		thumbs: Array<string>,
 	}>{
-		constructor(props){
+		constructor(props) {
 			super(props)
-			const images		= []
+			const images = []
 			images.push(require('../temp/imageHitler.js').imageHitler)
 			images.push(require('../temp/imageBig.js').image)
 			images.push(require('../temp/imageBili.js').image)
 			images.push(require('../temp/imageTall.js').image)
 			images.push(require('../temp/imageLogo.js').image)
-			this.state		= {
+			this.state = {
 				images,
-				thumbs		: [],
+				thumbs: [],
 			}
 		}
 
-		componentDidMount(){
+		componentDidMount() {
 			this.loadThumb()
 		}
 
@@ -1481,24 +1481,24 @@ if(false){
 			/*
 			 * To gen thumb
 			 */
-			let thumbs		= []
-			const {AvatarModel}		= require('../model/AvatarModel.js')
-			const avatarModel		= new AvatarModel()
-			for(let i = 0 ; i < this.state.images.length; i++){
-				const image		= this.state.images[i]
-				const thumb		= await avatarModel.genAvatarThumb(image)	
+			let thumbs = []
+			const { AvatarModel } = require('../model/AvatarModel.js')
+			const avatarModel = new AvatarModel()
+			for (let i = 0; i < this.state.images.length; i++) {
+				const image = this.state.images[i]
+				const thumb = await avatarModel.genAvatarThumb(image)
 				thumbs.push(thumb)
 			}
-			this.setState({thumbs})
+			this.setState({ thumbs })
 		}
 
-		render(){
-			return(
+		render() {
+			return (
 				<div>
-					<h1>This story show the fn of genAvatarThumb, in 
+					<h1>This story show the fn of genAvatarThumb, in
 					various cases</h1>
 					<h2>The original image</h2>
-					{this.state.images.map(image => 
+					{this.state.images.map(image =>
 						<img src={image} />
 					)}
 					<h2>The thumbs</h2>
@@ -1510,8 +1510,8 @@ if(false){
 		}
 	}
 
-	stories.add('AvatarThumb', () => 
-		<Test/>
+	stories.add('AvatarThumb', () =>
+		<Test />
 	)
 	//}}}
 }

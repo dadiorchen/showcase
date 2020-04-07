@@ -1,62 +1,62 @@
 //@flow
-import PouchDB		from 'pouchdb'
-import PouchdbFind	from 'pouchdb-find'
-import React		from 'react'
-import {mount, shallow}		from 'enzyme'
-import loglevel		from 'loglevel'
+import PouchDB from 'pouchdb'
+import PouchdbFind from 'pouchdb-find'
+import React from 'react'
+import { mount, shallow } from 'enzyme'
+import loglevel from 'loglevel'
 
-import {utils}		from '../utils/Utils.js'
-import {ERROR}		from '../error.js'
-import {Navigator, NavigatorConnected}		from './Navigator.js'
-import * as testUtils		from '../testUtils.js'
-import {Hashtag}		from '../model/Hashtag.js'
-import {Position}		from '../model/Navigator.js'
-import {FactoryComponent}		from '../factoryComponent.js'
+import { utils } from '../utils/Utils.js'
+import { ERROR } from '../error.js'
+import { Navigator, NavigatorConnected } from './Navigator.js'
+import * as testUtils from '../testUtils.js'
+import { Hashtag } from '../model/Hashtag.js'
+import { Position } from '../model/Navigator.js'
+import { FactoryComponent } from '../factoryComponent.js'
 
 jest.mock('pouchdb')
 jest.mock('jquery')
 jest.useFakeTimers()
-const log		= loglevel.getLogger('../component/Navigator.test.js')
+const log = loglevel.getLogger('../component/Navigator.test.js')
 log.setLevel('trace')
 loglevel.getLogger('../component/Navigator.js').setLevel('trace')
 
 describe('test Navigator', () => {
 	//{{{
-	const label		= 'Navigator -> test'
+	const label = 'Navigator -> test'
 	let props
 	let hashtagA
 
 	beforeEach(() => {
-		hashtagA		= new Hashtag('A')
-		const navigatorModel		= {
-			getPositionsBack		: testUtils.jestFn([], 'getPositionBack'),
-			getPositionsForward		: 
+		hashtagA = new Hashtag('A')
+		const navigatorModel = {
+			getPositionsBack: testUtils.jestFn([], 'getPositionBack'),
+			getPositionsForward:
 				testUtils.jestFn([], 'getPositionForward'),
-			jump		: testUtils.jestPromiseTrue('jump'),
-			visitHashtag		: testUtils.jestPromiseTrue('visitHashtag'),
+			jump: testUtils.jestPromiseTrue('jump'),
+			visitHashtag: testUtils.jestPromiseTrue('visitHashtag'),
 		}
-		const mindmapModel		= {
+		const mindmapModel = {
 		}
-		const hashtagModel		= {
-			getBreadcrumbs		: testUtils.jestFn([hashtagA._id], 'getBreadcrumbs'),
+		const hashtagModel = {
+			getBreadcrumbs: testUtils.jestFn([hashtagA._id], 'getBreadcrumbs'),
 		}
-		const hashtagTooltip		= {
-			handleMouseLeave		: testUtils.jestTrue('handleMouseLeave'),
+		const hashtagTooltip = {
+			handleMouseLeave: testUtils.jestTrue('handleMouseLeave'),
 		}
-		props		= {
-			goto		: testUtils.jestTrue('goto'),
-			menuStatus		: 'document',
-			getNavigatorModel		: () => navigatorModel,
-			getMindmapModel		: () => mindmapModel,
-			getHashtagModel		: () => hashtagModel,
-			getNoteModel		: () => {},
-			factoryComponent		: new FactoryComponent(),
-			getHashtagTooltip		: () => hashtagTooltip,
-			navigator		: {},
+		props = {
+			goto: testUtils.jestTrue('goto'),
+			menuStatus: 'document',
+			getNavigatorModel: () => navigatorModel,
+			getMindmapModel: () => mindmapModel,
+			getHashtagModel: () => hashtagModel,
+			getNoteModel: () => { },
+			factoryComponent: new FactoryComponent(),
+			getHashtagTooltip: () => hashtagTooltip,
+			navigator: {},
 		}
-		const jQuery		= require('jquery')
+		const jQuery = require('jquery')
 		jQuery.mockImplementation(() => ({
-			offset		: () => ({left:0, top:0}),
+			offset: () => ({ left: 0, top: 0 }),
 		}))
 	})
 
@@ -65,7 +65,7 @@ describe('test Navigator', () => {
 		let navigator
 
 		beforeEach(() => {
-			navigator		= shallow(
+			navigator = shallow(
 				//$FlowFixMe
 				<Navigator
 					documentRoot={hashtagA}
@@ -79,7 +79,7 @@ describe('test Navigator', () => {
 		})
 
 		it('under div .head-location-nav should have <Hashtag/> as breadcrumbs', () => {
-			expect(navigator.find('.head-location-nav').find(props.factoryComponent.Hashtag)).toHaveLength(1) 
+			expect(navigator.find('.head-location-nav').find(props.factoryComponent.Hashtag)).toHaveLength(1)
 		})
 
 		describe('call updateBreadcrumbs', () => {
@@ -124,8 +124,8 @@ describe('test Navigator', () => {
 				let spyHideMenu
 
 				beforeEach(() => {
-					spyShowMenu		= jest.spyOn(navigator.instance(), 'showMenu')
-					spyHideMenu		= jest.spyOn(navigator.instance(), 'hideMenu')
+					spyShowMenu = jest.spyOn(navigator.instance(), 'showMenu')
+					spyHideMenu = jest.spyOn(navigator.instance(), 'hideMenu')
 				})
 
 				it('default state should be invisible', () => {
@@ -159,7 +159,7 @@ describe('test Navigator', () => {
 							let position
 
 							beforeEach(async () => {
-								position		= Position.buildByHashtagId(hashtagA._id)
+								position = Position.buildByHashtagId(hashtagA._id)
 								await navigator.instance().handleMenuClick(position)
 							})
 
@@ -354,9 +354,9 @@ describe('test Navigator', () => {
 		describe('call handleClickBack', () => {
 			//{{{
 			beforeEach(async () => {
-				const position		= Position.buildByHashtagId(hashtagA._id)
+				const position = Position.buildByHashtagId(hashtagA._id)
 				//$FlowFixMe
-				props.getNavigatorModel().goBack		= testUtils.jestPromise(position, 'goBack')
+				props.getNavigatorModel().goBack = testUtils.jestPromise(position, 'goBack')
 				await navigator.instance().handleClickBack()
 			})
 
@@ -369,9 +369,9 @@ describe('test Navigator', () => {
 		describe('call handleClickForward', () => {
 			//{{{
 			beforeEach(async () => {
-				const position		= Position.buildByHashtagId(hashtagA._id)
+				const position = Position.buildByHashtagId(hashtagA._id)
 				//$FlowFixMe
-				props.getNavigatorModel().goForward		= testUtils.jestPromise(position, 'goForward')
+				props.getNavigatorModel().goForward = testUtils.jestPromise(position, 'goForward')
 				await navigator.instance().handleClickForward()
 			})
 
@@ -386,8 +386,8 @@ describe('test Navigator', () => {
 			let position
 
 			beforeEach(() => {
-				position		= Position.buildByHashtagId(hashtagA._id)
-				props.getNavigatorModel().getPositionsBack		= testUtils.jestFn([position], 'getPositionsBack')
+				position = Position.buildByHashtagId(hashtagA._id)
+				props.getNavigatorModel().getPositionsBack = testUtils.jestFn([position], 'getPositionsBack')
 				navigator.instance().showMenu('back')
 			})
 
@@ -404,7 +404,7 @@ describe('test Navigator', () => {
 		let navigator
 
 		beforeEach(() => {
-			navigator		= shallow(
+			navigator = shallow(
 				//$FlowFixMe
 				<Navigator
 					documentRoot={undefined}
@@ -430,7 +430,7 @@ describe('test NavigatorConnected', () => {
 		shallow(
 			<testUtils.Container>
 				<NavigatorConnected
-					goto={() => {}}
+					goto={() => { }}
 				/>
 			</testUtils.Container>
 		).html()

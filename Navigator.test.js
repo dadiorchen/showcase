@@ -1,48 +1,48 @@
 //@flow
-import loglevel		from 'loglevel'
+import loglevel from 'loglevel'
 
-import {Navigator,Position}	from './Navigator.js'
-import {Hashtag}	from './Hashtag.js'
-import {Note}		from './Note.js'
-import {utils}		from '../utils/Utils.js'
-import {StoreModel}	from './StoreModel.js'
-import {FactoryTest}		from '../factory.js'
-import {ERROR}		from '../error.js'
-import {getStore}		from './store.js'
-import {StateNavigator}		from './states/StateNavigator.js'
-import * as testUtils		from '../testUtils.js'
+import { Navigator, Position } from './Navigator.js'
+import { Hashtag } from './Hashtag.js'
+import { Note } from './Note.js'
+import { utils } from '../utils/Utils.js'
+import { StoreModel } from './StoreModel.js'
+import { FactoryTest } from '../factory.js'
+import { ERROR } from '../error.js'
+import { getStore } from './store.js'
+import { StateNavigator } from './states/StateNavigator.js'
+import * as testUtils from '../testUtils.js'
 
-const log		= loglevel.getLogger('../model/Navigator.test.js')
+const log = loglevel.getLogger('../model/Navigator.test.js')
 log.setLevel('trace')
 loglevel.getLogger('../model/Navigator.js').setLevel('trace')
 
 
 describe('Navigator', () => {
 	//{{{
-	const label		= 'Navigator -> test'
+	const label = 'Navigator -> test'
 	let navigator
 	let dbNote
 	let store
 	let stateNavigator
 	let hashtagModel
-	
+
 
 	beforeEach(() => {
-		dbNote		= {
-			get		: testUtils.jestPromiseTrue(),
-			put		: testUtils.jestPromise({}, 'put'),
+		dbNote = {
+			get: testUtils.jestPromiseTrue(),
+			put: testUtils.jestPromise({}, 'put'),
 		}
-		store		= getStore()
-		let _getStore		= () => store
+		store = getStore()
+		let _getStore = () => store
 		//use real state object
-		stateNavigator		= new StateNavigator(_getStore)
-		hashtagModel		= {
+		stateNavigator = new StateNavigator(_getStore)
+		hashtagModel = {
 		}
 		//$FlowFixMe
-		navigator		= new Navigator({
-			_getDBNote		: () => dbNote,
-			_getStateNavigator		: () => stateNavigator,
-			_getHashtagModel		: () => hashtagModel,
+		navigator = new Navigator({
+			_getDBNote: () => dbNote,
+			_getStateNavigator: () => stateNavigator,
+			_getHashtagModel: () => hashtagModel,
 		})
 	})
 
@@ -56,10 +56,10 @@ describe('Navigator', () => {
 		/*
 		 * a easy way to build the state of navigator
 		 */
-		function build(histories : Array<Hashtag>, current: number){
+		function build(histories: Array<Hashtag>, current: number) {
 			//build the data
 			navigator._getStateNavigator().save({
-				histories		: histories.map(hashtag => {
+				histories: histories.map(hashtag => {
 					return Position.buildByHashtagId(hashtag._id)
 				}),
 				current,
@@ -68,45 +68,45 @@ describe('Navigator', () => {
 		/*
 		 * a convenient way to show the state of navigator
 		 */
-		function print():string{
-			let result		= '['
-			const {histories, current}		= 
+		function print(): string {
+			let result = '['
+			const { histories, current } =
 				navigator._getStateNavigator().get()
 			log.warn('!', histories)
-			for(let i = 0; i < histories.length; i++){
-				result		+= 
-					`${i === current?'->':''}${hashtagMap[histories[i].getKey()].name}, `
+			for (let i = 0; i < histories.length; i++) {
+				result +=
+					`${i === current ? '->' : ''}${hashtagMap[histories[i].getKey()].name}, `
 			}
-			result		+= ']'
+			result += ']'
 			return result
 		}
-		function printHistories(histories : Array<Position>){
-			let result		= '['
-			for(let i = 0; i < histories.length; i++){
-				result		+= 
+		function printHistories(histories: Array<Position>) {
+			let result = '['
+			for (let i = 0; i < histories.length; i++) {
+				result +=
 					`${hashtagMap[histories[i].getKey()].name}, `
 			}
-			result		+= ']'
+			result += ']'
 			return result
 		}
 
 		beforeEach(() => {
-			hashtagA		= new Hashtag('A')
-			hashtagB		= new Hashtag('B')
-			hashtagC		= new Hashtag('C')
-			hashtagD		= new Hashtag('D')
-			hashtagMap		= {
-				[hashtagA._id]		: hashtagA,
-				[hashtagB._id]		: hashtagB,
-				[hashtagC._id]		: hashtagC,
-				[hashtagD._id]		: hashtagD,
+			hashtagA = new Hashtag('A')
+			hashtagB = new Hashtag('B')
+			hashtagC = new Hashtag('C')
+			hashtagD = new Hashtag('D')
+			hashtagMap = {
+				[hashtagA._id]: hashtagA,
+				[hashtagB._id]: hashtagB,
+				[hashtagC._id]: hashtagC,
+				[hashtagD._id]: hashtagD,
 			}
 			//$FlowFixMe
-			navigator._save		= testUtils.jestPromiseTrue('_save')
+			navigator._save = testUtils.jestPromiseTrue('_save')
 		})
 
-		it('initial state is {histories:[], current:0}', () =>{
-			expect(stateNavigator.get()).toEqual({histories:[], current:0})
+		it('initial state is {histories:[], current:0}', () => {
+			expect(stateNavigator.get()).toEqual({ histories: [], current: 0 })
 		})
 
 		describe('visitHashtag A', () => {
@@ -119,7 +119,7 @@ describe('Navigator', () => {
 			})
 
 			it('state is [->A] (-> means current)', () => {
-				const state		= stateNavigator.get()
+				const state = stateNavigator.get()
 				expect(state.current).toBe(0)
 				expect(state.histories).toHaveLength(1)
 				expect(state.histories[0]._key).toBe(hashtagA._id)
@@ -135,7 +135,7 @@ describe('Navigator', () => {
 				})
 
 				it('state is [A, ->B]', () => {
-					const state		= stateNavigator.get()
+					const state = stateNavigator.get()
 					expect(state.current).toBe(1)
 					expect(state.histories).toHaveLength(2)
 					expect(state.histories[0]._key).toBe(hashtagA._id)
@@ -172,7 +172,7 @@ describe('Navigator', () => {
 					})
 
 					it('state is [A, B, ->C]', () => {
-						const state		= stateNavigator.get()
+						const state = stateNavigator.get()
 						expect(state.current).toBe(2)
 						expect(state.histories).toHaveLength(3)
 						expect(state.histories[0]._key).toBe(hashtagA._id)
@@ -187,7 +187,7 @@ describe('Navigator', () => {
 						})
 
 						it('state is [A, ->B, C]', () => {
-							const state		= stateNavigator.get()
+							const state = stateNavigator.get()
 							expect(state.current).toBe(1)
 							expect(state.histories).toHaveLength(3)
 							expect(state.histories[0]._key).toBe(hashtagA._id)
@@ -210,7 +210,7 @@ describe('Navigator', () => {
 							})
 
 							it('state is [A, B, ->C]', () => {
-								const state		= stateNavigator.get()
+								const state = stateNavigator.get()
 								expect(state.current).toBe(2)
 								expect(state.histories).toHaveLength(3)
 								expect(state.histories[0]._key).toBe(hashtagA._id)
@@ -230,7 +230,7 @@ describe('Navigator', () => {
 							})
 
 							it('state is [A, B, ->D]', () => {
-								const state		= stateNavigator.get()
+								const state = stateNavigator.get()
 								expect(state.current).toBe(2)
 								expect(state.histories).toHaveLength(3)
 								expect(state.histories[0]._key).toBe(hashtagA._id)
@@ -245,13 +245,13 @@ describe('Navigator', () => {
 					describe('jump -> A', () => {
 						//{{{
 						beforeEach(async () => {
-							const state		= stateNavigator.get()
+							const state = stateNavigator.get()
 							expect(state.histories[0]._key).toBe(hashtagA._id)
 							await utils.a(() => utils.E(), navigator.jump(state.histories[0]))
 						})
 
 						it('state is [->A, B, C]', () => {
-							const state		= stateNavigator.get()
+							const state = stateNavigator.get()
 							expect(state.current).toBe(0)
 							expect(state.histories).toHaveLength(3)
 							expect(state.histories[0]._key).toBe(hashtagA._id)
@@ -275,7 +275,7 @@ describe('Navigator', () => {
 			})
 
 			it('print() navigator should be :[A, B, ->C, ]', () => {
-				const result		= print()
+				const result = print()
 				log.warn('!!!', result)
 				expect(result).toBe('[A, B, ->C, ]')
 			})
@@ -301,10 +301,10 @@ describe('Navigator', () => {
 			})
 
 			it('jump(B) should be [A, ->B, C, ], and should return a Position', async () => {
-				const position		= navigator._getStateNavigator()
+				const position = navigator._getStateNavigator()
 					.get()
 					.histories[1]
-				const result		= await navigator.jump(position)
+				const result = await navigator.jump(position)
 				expect(result).toBeInstanceOf(Position)
 				expect(print()).toBe('[A, ->B, C, ]')
 			})
@@ -342,9 +342,9 @@ describe('Navigator', () => {
 			//{{{
 			it('for initial, toObject should be: {histories:[], current:0}', () => {
 				expect(navigator.toObject()).toEqual({
-					_id		: Navigator.DB_KEY,
-					current		: 0,
-					histories		: [],
+					_id: Navigator.DB_KEY,
+					current: 0,
+					histories: [],
 				})
 			})
 
@@ -361,8 +361,8 @@ describe('Navigator', () => {
 				it('toObject should be: ', () => {
 					expect(navigator.toObject())
 						.toMatchObject({
-							histories		: [`/${hashtagB._id}`],
-							current		: 0
+							histories: [`/${hashtagB._id}`],
+							current: 0
 						})
 				})
 				//}}}
@@ -379,7 +379,7 @@ describe('Navigator', () => {
 		describe('first save', () => {
 			//{{{
 			beforeEach(async () => {
-				dbNote.get		= () => {
+				dbNote.get = () => {
 					log.warn('%s:mock get', label)
 					return Promise.reject(utils.E(ERROR.GENERAL_NOT_FOUND))
 				}
@@ -391,9 +391,9 @@ describe('Navigator', () => {
 
 			it('put should be called with ', () => {
 				expect(dbNote.put).toHaveBeenCalledWith({
-					_id		: Navigator.DB_KEY,
-					current		: 0,
-					histories		: [],
+					_id: Navigator.DB_KEY,
+					current: 0,
+					histories: [],
 				})
 			})
 			//}}}
@@ -402,18 +402,18 @@ describe('Navigator', () => {
 		describe('non-first save, and current = 1', () => {
 			//{{{
 			beforeEach(async () => {
-				dbNote.get		= jest.fn(() => {
+				dbNote.get = jest.fn(() => {
 					log.warn('%s:mock get', label)
 					return Promise.resolve({
-						_id		: Navigator.DB_KEY,
-						current		: 0,
+						_id: Navigator.DB_KEY,
+						current: 0,
 					})
 				})
 				//$FlowFixMe
-				navigator._getStateNavigator().get		= testUtils.jestFn(
+				navigator._getStateNavigator().get = testUtils.jestFn(
 					{
-						histories		: [],
-						current		: 1,
+						histories: [],
+						current: 1,
 					}
 				)
 				utils.isType(
@@ -424,9 +424,9 @@ describe('Navigator', () => {
 
 			it('put should be called with {...,current:1}', () => {
 				expect(dbNote.put).toHaveBeenCalledWith({
-					_id		: Navigator.DB_KEY,
-					current		: 1,
-					histories		: [],
+					_id: Navigator.DB_KEY,
+					current: 1,
+					histories: [],
 				})
 			})
 			//}}}
@@ -438,15 +438,15 @@ describe('Navigator', () => {
 		//{{{
 		beforeEach(() => {
 			//$FlowFixMe
-			navigator.checkNavigator		= testUtils.jestPromiseTrue()
+			navigator.checkNavigator = testUtils.jestPromiseTrue()
 		})
 
 		describe('load at the first time', () => {
 			//{{{
 			let spySave
 			beforeEach(async () => {
-				spySave		= jest.spyOn(stateNavigator, 'save')
-				dbNote.get		= jest.fn(() => {
+				spySave = jest.spyOn(stateNavigator, 'save')
+				dbNote.get = jest.fn(() => {
 					log.warn('%s:mock get not found', label)
 					return Promise.reject(utils.E(ERROR.GENERAL_NOT_FOUND))
 				})
@@ -459,9 +459,9 @@ describe('Navigator', () => {
 			it('should set redux/state with {current:0, position:/0}', () => {
 				testUtils.expectImproved(spySave)
 					.toHaveBeenLastCalledWithMatch({
-						current		: 0,
-						histories		: [{
-							_key		: '0',
+						current: 0,
+						histories: [{
+							_key: '0',
 						}]
 					})
 			})
@@ -476,18 +476,18 @@ describe('Navigator', () => {
 			let state
 
 			beforeEach(async () => {
-				hashtagA		= new Hashtag('A')
-				hashtagB		= new Hashtag('B')
-				state		= {
-					_id		: Navigator.DB_KEY,
-					current		: 1,
-					histories		: [
+				hashtagA = new Hashtag('A')
+				hashtagB = new Hashtag('B')
+				state = {
+					_id: Navigator.DB_KEY,
+					current: 1,
+					histories: [
 						`/${hashtagA._id}`,
 						`/${hashtagB._id}`,
 					]
 				}
-				spySave		= jest.spyOn(stateNavigator, 'save')
-				dbNote.get		= jest.fn(() => {
+				spySave = jest.spyOn(stateNavigator, 'save')
+				dbNote.get = jest.fn(() => {
 					log.warn('%s:mock get not found', label)
 					return Promise.resolve(state)
 				})
@@ -501,9 +501,9 @@ describe('Navigator', () => {
 				testUtils.expectImproved(spySave)
 					.toHaveBeenLastCalledWithMatch(
 						{
-							current		: 1,
-							histories		: [
-								expect.any(Position), 
+							current: 1,
+							histories: [
+								expect.any(Position),
 								expect.any(Position)
 							],
 						}
@@ -513,14 +513,14 @@ describe('Navigator', () => {
 			describe('CASE: dbNote.get return {current:0, histories:["/xxx"]}, change the return state from db to a wrong result', () => {
 				//{{{
 				beforeEach(() => {
-					state.histories		= ['/x']
+					state.histories = ['/x']
 				})
 
 				it('load() should throw error, cuz parse the data fail', async () => {
-					try{
+					try {
 						await navigator.load()
 						expect('fail').toBe(true)
-					}catch(e){
+					} catch (e) {
 						expect(e.message === ERROR.NAVIGATOR_HISTORY_PARSE_FAILURE)
 					}
 				})
@@ -529,7 +529,7 @@ describe('Navigator', () => {
 			//}}}
 		})
 
-		
+
 		//}}}
 	})
 
@@ -539,11 +539,11 @@ describe('Navigator', () => {
 		let hashtagB
 		let hashtagByIds
 		beforeEach(() => {
-			hashtagA		= new Hashtag('A')
-			hashtagB		= new Hashtag('B')
-			hashtagByIds		= {
-				[hashtagA._id]		: hashtagA,
-				[hashtagB._id]		: hashtagB,
+			hashtagA = new Hashtag('A')
+			hashtagB = new Hashtag('B')
+			hashtagByIds = {
+				[hashtagA._id]: hashtagA,
+				[hashtagB._id]: hashtagB,
 			}
 		})
 
@@ -551,18 +551,18 @@ describe('Navigator', () => {
 			//{{{
 			beforeEach(() => {
 				stateNavigator.save({
-					current		: 1,
-					histories		: [
+					current: 1,
+					histories: [
 						Position.buildByHashtagId(hashtagA._id),
 						Position.buildByHashtagId(hashtagB._id),
 					],
 				})
-				hashtagModel.getHashtag		= (e) => {
+				hashtagModel.getHashtag = (e) => {
 					log.warn('%s:mock getHashtag', label)
-					const result		= hashtagByIds[e]
-					if(result){
+					const result = hashtagByIds[e]
+					if (result) {
 						return Promise.resolve(result)
-					}else{
+					} else {
 						return Promise.reject(utils.E(ERROR.GENERAL_NOT_FOUND))
 					}
 				}
@@ -627,8 +627,8 @@ describe('Navigator', () => {
 			let spySave
 			beforeEach(async () => {
 				//$FlowFixMe
-				navigator._save		= testUtils.jestPromiseTrue()
-				spySave		= jest.spyOn(stateNavigator, 'save')
+				navigator._save = testUtils.jestPromiseTrue()
+				spySave = jest.spyOn(stateNavigator, 'save')
 				utils.isType(
 					await utils.a(() => utils.E(), navigator.clear()),
 					true
@@ -636,12 +636,12 @@ describe('Navigator', () => {
 			})
 
 			it('state should be saved with:{current:0, histories:["0"]}', () => {
-				const parameter		= spySave.mock.calls[0][0]
+				const parameter = spySave.mock.calls[0][0]
 				expect(parameter).toMatchObject({
-					current		: 0,
-					histories		: [
+					current: 0,
+					histories: [
 						{
-							_key		: '0',
+							_key: '0',
 						}
 					],
 				})
@@ -664,8 +664,8 @@ describe('Position', () => {
 		//{{{
 		let hashtag
 		beforeEach(() => {
-			hashtag		= new Hashtag('tag')
-			position		= Position.buildByHashtagId(hashtag._id)
+			hashtag = new Hashtag('tag')
+			position = Position.buildByHashtagId(hashtag._id)
 		})
 
 		it('position.key === tag._id', () => {
@@ -684,7 +684,7 @@ describe('Position', () => {
 			//{{{
 			let positionParsed
 			beforeEach(() => {
-				positionParsed		= Position.parse(position.format())
+				positionParsed = Position.parse(position.format())
 			})
 
 			it('parsed position.key === tag._id', () => {
@@ -716,8 +716,8 @@ describe('Position', () => {
 		//{{{
 		let note
 		beforeEach(() => {
-			note		= new Note()
-			position		= Position.buildByNoteId(note._id)
+			note = new Note()
+			position = Position.buildByNoteId(note._id)
 		})
 
 		it('position.key === note._id', () => {
@@ -736,7 +736,7 @@ describe('Position', () => {
 			//{{{
 			let positionParsed
 			beforeEach(() => {
-				positionParsed		= Position.parse(position.format())
+				positionParsed = Position.parse(position.format())
 			})
 
 			it('parsed position.key === note._id', () => {
@@ -756,9 +756,9 @@ describe('Position', () => {
 		let note
 		let hashtag
 		beforeEach(() => {
-			hashtag		= new Hashtag('tag')
-			note		= new Note()
-			position		= Position.buildByHashtagAndNoteId(
+			hashtag = new Hashtag('tag')
+			note = new Note()
+			position = Position.buildByHashtagAndNoteId(
 				hashtag._id,
 				note._id
 			)
@@ -784,7 +784,7 @@ describe('Position', () => {
 			//{{{
 			let positionParsed
 			beforeEach(() => {
-				positionParsed		= Position.parse(position.format())
+				positionParsed = Position.parse(position.format())
 			})
 
 			it('parsed position.key === tag._id', () => {

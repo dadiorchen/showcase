@@ -1,40 +1,40 @@
 //@flow
 /* The model of hashtag */
-import {type Store}		from './store.js'
-import {ERROR}			from '../error.js'
-import {User}			from './User.js'
-import {DBNote}			from './DBNote.js'
-import {Hashtag}			from './Hashtag.js'
-import {utils}			from '../utils/Utils.js'
-import {NoteHashtag}	from './NoteHashtag.js'
-import {Note}			from './Note.js'
-import {Navigator as NavigatorModel}		from './Navigator.js'
-import {HashtagAlias}	from './HashtagAlias.js'
-import {NoteModel}		from './NoteModel.js'
-import {StateHashtag}		from './states/StateHashtag.js'
-import {HashtagIdCurrent}		from './states/HashtagIdCurrent.js'
+import { type Store } from './store.js'
+import { ERROR } from '../error.js'
+import { User } from './User.js'
+import { DBNote } from './DBNote.js'
+import { Hashtag } from './Hashtag.js'
+import { utils } from '../utils/Utils.js'
+import { NoteHashtag } from './NoteHashtag.js'
+import { Note } from './Note.js'
+import { Navigator as NavigatorModel } from './Navigator.js'
+import { HashtagAlias } from './HashtagAlias.js'
+import { NoteModel } from './NoteModel.js'
+import { StateHashtag } from './states/StateHashtag.js'
+import { HashtagIdCurrent } from './states/HashtagIdCurrent.js'
 
-const log		= require('loglevel').getLogger('../model/HashtagModel.js')
+const log = require('loglevel').getLogger('../model/HashtagModel.js')
 
 export class HashtagModel {
 	/*
 	 * Injection of module
 	 */
-	_getNoteModel		: () => NoteModel
-	_getDBNote		: () => DBNote
-	_getStateHashtag		: () => StateHashtag
-	_getHashtagIdCurrent		: () => HashtagIdCurrent
-	_getNavigatorModel		: () => NavigatorModel
+	_getNoteModel: () => NoteModel
+	_getDBNote: () => DBNote
+	_getStateHashtag: () => StateHashtag
+	_getHashtagIdCurrent: () => HashtagIdCurrent
+	_getNavigatorModel: () => NavigatorModel
 
 	constructor(
-		options		: {
-			_getNoteModel		: () => NoteModel,
-			_getDBNote		: () => DBNote,
-			_getStateHashtag		: () => StateHashtag,
-			_getHashtagIdCurrent		: () => HashtagIdCurrent,
-			_getNavigatorModel		: () => NavigatorModel,
+		options: {
+			_getNoteModel: () => NoteModel,
+			_getDBNote: () => DBNote,
+			_getStateHashtag: () => StateHashtag,
+			_getHashtagIdCurrent: () => HashtagIdCurrent,
+			_getNavigatorModel: () => NavigatorModel,
 		}
-	) : HashtagModel{
+	): HashtagModel {
 		//{{{
 		//bind
 		utils.isType(options._getNoteModel, 'Function')
@@ -42,7 +42,7 @@ export class HashtagModel {
 		utils.isType(options._getStateHashtag, 'Function')
 		utils.isType(options._getHashtagIdCurrent, 'Function')
 		utils.isType(options._getNavigatorModel, 'Function')
-		Object.assign(this,options)
+		Object.assign(this, options)
 		return this
 		//}}}
 	}
@@ -52,10 +52,10 @@ export class HashtagModel {
 	/*
 	 * Create a new hashtag, and update the hashtag to redux store
 	 */
-	async createHashtag(hashtag : Hashtag) : Promise<boolean>{
+	async createHashtag(hashtag: Hashtag): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> createHashtag'
-		log.debug('%s:with:%s',label,hashtag && hashtag._id)
+		const label = 'HashtagModel -> createHashtag'
+		log.debug('%s:with:%s', label, hashtag && hashtag._id)
 		utils.isTypeInstance(hashtag, Hashtag)
 		//make sure the name of this hashtag is OK
 		utils.isType(
@@ -76,7 +76,7 @@ export class HashtagModel {
 			true
 		)
 		utils.isType(
-			await utils.a(/*istanbul ignore next*/() => utils.E(),this._getDBNote().putHashtag(hashtag)),
+			await utils.a(/*istanbul ignore next*/() => utils.E(), this._getDBNote().putHashtag(hashtag)),
 			true
 		)
 		/* 
@@ -90,10 +90,10 @@ export class HashtagModel {
 		//}}}
 	}
 
-	async hashtagUpdate(hashtag : Hashtag) : Promise<boolean>{
+	async hashtagUpdate(hashtag: Hashtag): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> hashtagUpdate'
-		log.debug('%s:with:%s',label,hashtag && hashtag._id)
+		const label = 'HashtagModel -> hashtagUpdate'
+		log.debug('%s:with:%s', label, hashtag && hashtag._id)
 		//check
 		utils.isTypeInstance(hashtag, Hashtag)
 		utils.isType(
@@ -102,24 +102,24 @@ export class HashtagModel {
 		)
 		//first , need to check the tags in definition
 		utils.isType(
-			await utils.a(/*istanbul ignore next*/() => utils.E(),this._getNoteModel().noteHashtagUpdate(hashtag.getDefinition())),
+			await utils.a(/*istanbul ignore next*/() => utils.E(), this._getNoteModel().noteHashtagUpdate(hashtag.getDefinition())),
 			true
 		)
 		utils.isType(
-			await utils.a(/*istanbul ignore next*/() => utils.E(),this.checkParents(hashtag)),
+			await utils.a(/*istanbul ignore next*/() => utils.E(), this.checkParents(hashtag)),
 			true
 		)
 		utils.isType(
-			await utils.a(/*istanbul ignore next*/() => utils.E(),this.checkAncestor(hashtag)),
+			await utils.a(/*istanbul ignore next*/() => utils.E(), this.checkAncestor(hashtag)),
 			true
 		)
 		utils.isType(
-			await utils.a(/*istanbul ignore next*/() => utils.E(),this._getDBNote().putHashtag(hashtag)),
+			await utils.a(/*istanbul ignore next*/() => utils.E(), this._getDBNote().putHashtag(hashtag)),
 			true
 		)
 		//Need to re-create the hashtag , because need to fresh redux to make 
 		//component get informed the hashtag changed
-		const hashtagClone	= Hashtag.genHashtagByObject(hashtag)
+		const hashtagClone = Hashtag.genHashtagByObject(hashtag)
 		utils.isType(
 			this._getStateHashtag().saveHashtag(hashtagClone),
 			true
@@ -140,42 +140,42 @@ export class HashtagModel {
 	 * cut off it and move these code to complexUpdate, put them with LOST/
 	 * drop logic together.
 	 */
-	async checkParents(hashtag : Hashtag) : Promise<boolean>{
+	async checkParents(hashtag: Hashtag): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> checkParents'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> checkParents'
+		log.debug('%s:', label)
 		utils.isTypeInstance(hashtag, Hashtag)
 		/*
 		 * scan and get all the hashtag in definition
 		 */
-		let parentsInDefinition	: Array<Hashtag>	= []
-		if(hashtag.getDefinition()){
-			parentsInDefinition	= 
+		let parentsInDefinition: Array<Hashtag> = []
+		if (hashtag.getDefinition()) {
+			parentsInDefinition =
 				Object.values(hashtag.getDefinition().noteHashtagMap)
-				.map(noteHashtag => {
-					//$FlowFixMe
-					const parent	= noteHashtag.getHashtag()
-					return parent
-				})
+					.map(noteHashtag => {
+						//$FlowFixMe
+						const parent = noteHashtag.getHashtag()
+						return parent
+					})
 			log.debug(
 				'%s:find parents %d in definition',
 				label,
 				parentsInDefinition.length
 			)
 		}
-		hashtag.setParents(parentsInDefinition.map(hashtag => hashtag._id))           
-		
+		hashtag.setParents(parentsInDefinition.map(hashtag => hashtag._id))
+
 		/*
 		 * for hashtag in definition, check all of them, add current hashtag as 
 		 * child to them
 		 */
-		for(let i = 0 ; i < parentsInDefinition.length; i++){
-			const parent	= parentsInDefinition[i]
-			const children	= parent.getChildren()
-			if(children.indexOf(hashtag._id) >= 0){
-				log.trace('%s:child exist,skip',label)
-			}else{
-				log.trace('%s:child lost,add',label)
+		for (let i = 0; i < parentsInDefinition.length; i++) {
+			const parent = parentsInDefinition[i]
+			const children = parent.getChildren()
+			if (children.indexOf(hashtag._id) >= 0) {
+				log.trace('%s:child exist,skip', label)
+			} else {
+				log.trace('%s:child lost,add', label)
 				children.push(hashtag._id)
 				parent.setChildren(children)
 				//save
@@ -195,46 +195,46 @@ export class HashtagModel {
 	 * go through all the parents, append all its ancestor 
 	 * to current hashtag, include the parents themselves, 
 	 */
-	async checkAncestor(hashtag : Hashtag) : Promise<boolean>{
+	async checkAncestor(hashtag: Hashtag): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> checkAncestor'
-		log.trace('%s:',label)
+		const label = 'HashtagModel -> checkAncestor'
+		log.trace('%s:', label)
 		//check
 		utils.isTypeInstance(hashtag, Hashtag)
-		const parents	= hashtag.getParents()
+		const parents = hashtag.getParents()
 		log.trace(
 			'%s:add parents %d as ancestor',
 			label,
 			parents.length
 		)
-		let ancestor	= [...parents]
-		if(parents && parents.length > 0){
-			for(let i = 0 ; i < parents.length; i++){
-				const parentId	= parents[i]
-				const hashtagParent	= await utils.a(() => utils.E(), this.getHashtag(parentId))
-				const ancestorParent	= hashtagParent.getAncestor()
-				log.trace('%s:add parents\' ancestor %d',label,
+		let ancestor = [...parents]
+		if (parents && parents.length > 0) {
+			for (let i = 0; i < parents.length; i++) {
+				const parentId = parents[i]
+				const hashtagParent = await utils.a(() => utils.E(), this.getHashtag(parentId))
+				const ancestorParent = hashtagParent.getAncestor()
+				log.trace('%s:add parents\' ancestor %d', label,
 					ancestorParent.length)
 				ancestor.push(...ancestorParent)
 			}
-		}else{
-			log.trace('%s:parents is empty,skip ancestor check',label)
+		} else {
+			log.trace('%s:parents is empty,skip ancestor check', label)
 		}
 		log.trace('%s:get ancestor:%d', label, ancestor.length)
 		hashtag.setAncestor(ancestor)
 		return true
 		//}}}
 	}
-	
+
 	/*
 	 * Try to load all the hashtags from db, add convert to raw json from db
 	 * to real class/object
 	 */
-	async load() : Promise<boolean>{
-		const label		= 'HashtagModel -> load'
+	async load(): Promise<boolean> {
+		const label = 'HashtagModel -> load'
 		log.debug(label)
-		let hashtags	= await this._getDBNote().getHashtags()
-		log.debug('%s,load hashtags:%s',label,hashtags.length)
+		let hashtags = await this._getDBNote().getHashtags()
+		log.debug('%s,load hashtags:%s', label, hashtags.length)
 		/*
 		 * set to redux
 		 */
@@ -248,22 +248,22 @@ export class HashtagModel {
 		 */
 		//TODO  maybe the hashtag pure object was store into DB, 
 		//need to remove it from the definition's noteHashtag
-		log.debug('%s:to check definition noteHashtag hashtag',label)
-		for(let i = 0 ; i < hashtags.length ; i++){
-			const hashtag	= hashtags[i]
-			const definition	= hashtag.getDefinition()
-			if(definition){
-				for(let noteHashtagId in definition.noteHashtagMap){
-					const noteHashtag	= definition.noteHashtagMap[noteHashtagId]
-					let hashtag			= noteHashtag.getHashtag()
-					if(!hashtag || !hashtag.getChildren){
+		log.debug('%s:to check definition noteHashtag hashtag', label)
+		for (let i = 0; i < hashtags.length; i++) {
+			const hashtag = hashtags[i]
+			const definition = hashtag.getDefinition()
+			if (definition) {
+				for (let noteHashtagId in definition.noteHashtagMap) {
+					const noteHashtag = definition.noteHashtagMap[noteHashtagId]
+					let hashtag = noteHashtag.getHashtag()
+					if (!hashtag || !hashtag.getChildren) {
 						log.debug(
 							'%s:the hashtag is not OK, insert new one for :%o',
 							label,
 							noteHashtag.hashtagId,
 						)
-						hashtag	= await utils.a(() => utils.E(),this.getHashtag(noteHashtag.hashtagId))
-						utils.isType(hashtag,'Hashtag')
+						hashtag = await utils.a(() => utils.E(), this.getHashtag(noteHashtag.hashtagId))
+						utils.isType(hashtag, 'Hashtag')
 						noteHashtag.setHashtag(hashtag)
 					}
 				}
@@ -277,16 +277,16 @@ export class HashtagModel {
 	 * 	* first, get from redux, if not exist
 	 * 	* from db
 	 */
-	async getHashtag(hashtagId : string) : Promise<Hashtag>{
+	async getHashtag(hashtagId: string): Promise<Hashtag> {
 		//{{{
-		const label		= 'HashtagModel -> getHashtag'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> getHashtag'
+		log.debug('%s:', label)
 		Hashtag.checkId(hashtagId)
-		let result		= this._getStateHashtag().getHashtagById(hashtagId)
-		if(!result){
-			log.debug('%s:do not in redux cache:%s',label,hashtagId)
-			result		= await this._getDBNote().getHashtag(hashtagId)
-			utils.isType(result,'Hashtag')
+		let result = this._getStateHashtag().getHashtagById(hashtagId)
+		if (!result) {
+			log.debug('%s:do not in redux cache:%s', label, hashtagId)
+			result = await this._getDBNote().getHashtag(hashtagId)
+			utils.isType(result, 'Hashtag')
 			utils.isType(
 				this._getStateHashtag().saveHashtag(result),
 				true
@@ -297,28 +297,28 @@ export class HashtagModel {
 	}
 
 	/* Sync way to get hashtag, just search the cache , do not visit DB */
-	getHashtagSync(hashtagId : string) : Hashtag{
+	getHashtagSync(hashtagId: string): Hashtag {
 		//{{{
-		const label		= 'HashtagModel -> getHashtagSync'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> getHashtagSync'
+		log.debug('%s:', label)
 		Hashtag.checkId(hashtagId)
-		let result		= this._getStateHashtag().getHashtagById(hashtagId)
-		if(!result){
-			log.debug('%s:do not in redux cache:%s',label,hashtagId)
+		let result = this._getStateHashtag().getHashtagById(hashtagId)
+		if (!result) {
+			log.debug('%s:do not in redux cache:%s', label, hashtagId)
 			throw utils.E(ERROR.GENERAL_NOT_FOUND)
 		}
 		return result
 		//}}}
 	}
 
-	getHashtagByNameSync(hashtagName : string) : Hashtag{
+	getHashtagByNameSync(hashtagName: string): Hashtag {
 		//{{{
-		const label		= 'HashtagModel -> getHashtagSync'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> getHashtagSync'
+		log.debug('%s:', label)
 		utils.isType(hashtagName, 'string')
-		let result		= this._getStateHashtag().getHashtagByName(hashtagName)
-		if(!result){
-			log.debug('%s:do not in redux cache:%s',label, hashtagName)
+		let result = this._getStateHashtag().getHashtagByName(hashtagName)
+		if (!result) {
+			log.debug('%s:do not in redux cache:%s', label, hashtagName)
 			throw utils.E(ERROR.GENERAL_NOT_FOUND)
 		}
 		return result
@@ -334,109 +334,109 @@ export class HashtagModel {
 	 */
 	/*istanbul ignore next: no need to test*/
 	async checkSpecialHashtag(
-		options : {
-			isTest	: boolean,
-		}	= {
-			isTest	: true
-		}
-	) : Promise<{
+		options: {
+			isTest: boolean,
+		} = {
+				isTest: true
+			}
+	): Promise<{
 		//if every special hashtag is correct?
-		result		: boolean,
+		result: boolean,
 		//how many hashtag have been created
-		countCreated		: number,
+		countCreated: number,
 		//how many hashtag have been modified
-		countModified		: number,
+		countModified: number,
 		//The count of special hashtag definition in hashtag class
-		countExpected		: number,
+		countExpected: number,
 		//The existed in db already
-		countExisted		: number,
+		countExisted: number,
 		//The count of wrong hashtag which exist but the content is corrupt
-		countWrong		: number,
-	}>{
+		countWrong: number,
+	}> {
 		//{{{
-		const label		= 'HashtagModel -> checkSpecialHashtag'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> checkSpecialHashtag'
+		log.debug('%s:', label)
 		/*
 		 * Before work, check if the hashtags were loaded
 		 */
-		if(this._getStateHashtag().getHashtags().length === 0){
+		if (this._getStateHashtag().getHashtags().length === 0) {
 			log.debug('%s:hashtags do not load, load it!', label)
 			utils.isType(
 				await utils.a(() => utils.E(), this.load()),
 				true
 			)
 		}
-		let result	:any	= {}
-		result.result		= true
-		result.countExisted		= 0
-		result.countCreated		= 0
-		result.countModified		= 0
-		result.countExpected		= 0
-		result.countWrong		= 0
-		for(let hashtagName	in Hashtag.SPECIAL_HASHTAGS){
+		let result: any = {}
+		result.result = true
+		result.countExisted = 0
+		result.countCreated = 0
+		result.countModified = 0
+		result.countExpected = 0
+		result.countWrong = 0
+		for (let hashtagName in Hashtag.SPECIAL_HASHTAGS) {
 			result.countExpected++
-			log.debug('%s:to check:%s',label,hashtagName)
+			log.debug('%s:to check:%s', label, hashtagName)
 			//$FlowFixMe
-			const hashtag	= Hashtag.SPECIAL_HASHTAGS[hashtagName].build()
+			const hashtag = Hashtag.SPECIAL_HASHTAGS[hashtagName].build()
 			/*
 			 * check if the special hashtag exist in redux, if not , create,
 			 * if true, still need to check some other things, like: doc hashtag
 			 * data type have been changed from text area to combination type,
 			 * so, need to check if the type is correct
 			 */
-			const hashtagInRedux		= this._getStateHashtag().getHashtagByName(hashtag.name)
-			if(!hashtagInRedux){
-				result.result		= false
-				if(options.isTest === false){
+			const hashtagInRedux = this._getStateHashtag().getHashtagByName(hashtag.name)
+			if (!hashtagInRedux) {
+				result.result = false
+				if (options.isTest === false) {
 					log.debug('%s:to create missed hashtag', label)
 					result.countCreated++
-					try{
-						const ok	= await this.createHashtag(hashtag)
-						if(ok !== true){
-							const e		= utils.errorWrapper('create special hashtag fail')
+					try {
+						const ok = await this.createHashtag(hashtag)
+						if (ok !== true) {
+							const e = utils.errorWrapper('create special hashtag fail')
 							throw e
 						}
-					}catch(e){
-						e	= utils.errorWrapper(e)
+					} catch (e) {
+						e = utils.errorWrapper(e)
 						throw e
 					}
 				}
-			}else{
+			} else {
 				result.countExisted++
-				log.debug('%s:special tag:%s existed',label,hashtag.name)
+				log.debug('%s:special tag:%s existed', label, hashtag.name)
 				/*
 				 * Check: the data type is equal to the definition in Hashtag 
 				 * class
 				 */
-				let isCorrect		= true
-				if(hashtag.dataType){
-					if(
-						hashtag.dataType.type && 
+				let isCorrect = true
+				if (hashtag.dataType) {
+					if (
+						hashtag.dataType.type &&
 						hashtagInRedux.dataType &&
 						hashtagInRedux.dataType.type &&
 						hashtag.dataType.type === hashtagInRedux.dataType.type
-					){
+					) {
 						log.debug('%s:OK, the data type is equal', label)
-					}else{
+					} else {
 						log.debug('%s:dataType wrong', label)
-						isCorrect		= false
+						isCorrect = false
 					}
-				}else{
-					if(hashtagInRedux.dataType){
+				} else {
+					if (hashtagInRedux.dataType) {
 						log.debug('%s:the hashtag should not have dataType',
 							label
 						)
-						isCorrect		= false
+						isCorrect = false
 					}
 				}
-				if(isCorrect === false){
+				if (isCorrect === false) {
 					result.countWrong++
-					result.result		= false
-					if(options.isTest === false){
+					result.result = false
+					if (options.isTest === false) {
 						log.debug('%s:try to reset the wrong hashtag', label)
 						result.countModified++
 						//just modify the dataType
-						hashtagInRedux.dataType		= hashtag.dataType
+						hashtagInRedux.dataType = hashtag.dataType
 						log.trace('%s:the new hashtag to store to db:%o',
 							label,
 							hashtagInRedux
@@ -460,53 +460,53 @@ export class HashtagModel {
 	 * TODO maybe there is performance problem
 	 * */
 	autoComplete(
-		text : string,
-		options		: {
-			isSpecialHashtagEnabled?		: boolean,
-		}		= {
-		},
-	) : Array<Hashtag | HashtagAlias>{
+		text: string,
+		options: {
+			isSpecialHashtagEnabled?: boolean,
+		} = {
+			},
+	): Array<Hashtag | HashtagAlias> {
 		//{{{
-		const label		= 'HashtagModel -> autoComplete'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> autoComplete'
+		log.debug('%s:', label)
 		//default
-		options		= Object.assign(
+		options = Object.assign(
 			{
-				isSpecialHashtagEnabled		: false,
+				isSpecialHashtagEnabled: false,
 			},
 			options,
 		)
-		const result	= []
+		const result = []
 		/*
 		 * REVISE Wed Jan 23 11:30:29 CST 2019
 		 * 	If text is empty, then result is empty too
 		 */
-		if(text.trim() === ''){
+		if (text.trim() === '') {
 			return result
 		}
-		const hashtags		= this._getStateHashtag().getHashtags()
-		text		= text.toLowerCase()
-		for(let hashtag of hashtags){
+		const hashtags = this._getStateHashtag().getHashtags()
+		text = text.toLowerCase()
+		for (let hashtag of hashtags) {
 			//skip some hashtag
-			if(hashtag.name === 'Midilink'){
+			if (hashtag.name === 'Midilink') {
 				continue
 			}
 			//skip the special hashtag 
 			//$FlowFixMe
-			if(Hashtag.SPECIAL_HASHTAGS[hashtag.name] && 
+			if (Hashtag.SPECIAL_HASHTAGS[hashtag.name] &&
 				options.isSpecialHashtagEnabled === false
-			){
+			) {
 				continue
 			}
-			if(hashtag.name.toLowerCase().indexOf(text) >= 0){
+			if (hashtag.name.toLowerCase().indexOf(text) >= 0) {
 				result.push(hashtag)
-			}else if(hashtag.getTriggers().some(trigger => {
+			} else if (hashtag.getTriggers().some(trigger => {
 				return trigger.toLowerCase().indexOf(text) >= 0
-			})){
+			})) {
 				result.push(hashtag)
-			}else{
+			} else {
 				hashtag.getAliases().forEach(hashtagAlias => {
-					if(hashtagAlias.getName().toLowerCase().indexOf(text) >= 0){
+					if (hashtagAlias.getName().toLowerCase().indexOf(text) >= 0) {
 						result.push(hashtagAlias)
 					}
 				})
@@ -517,43 +517,43 @@ export class HashtagModel {
 	}
 
 	/* Get the list of recently created hashtags */
-	getHashtagsRecentlyCreated(count : number) : Array<Hashtag> {
+	getHashtagsRecentlyCreated(count: number): Array<Hashtag> {
 		//{{{
-		const label		= 'HashtagModel -> getHashtagsRecentlyCreated'
-		log.debug('%s:',label)
-		const result	= []
+		const label = 'HashtagModel -> getHashtagsRecentlyCreated'
+		log.debug('%s:', label)
+		const result = []
 		return this._getStateHashtag()
 			.getHashtags()
 			.filter(hashtag => {
 				//$FlowFixMe
-				if(Hashtag.SPECIAL_HASHTAGS[hashtag.name]){
+				if (Hashtag.SPECIAL_HASHTAGS[hashtag.name]) {
 					return false
-				}else{
+				} else {
 					return true
 				}
 			})
-			.sort((a,b) => {
+			.sort((a, b) => {
 				return b.createdTime - a.createdTime
 			})
-			.slice(0,count)
+			.slice(0, count)
 		//}}}
 	}
 
 	/* Get the whole index list of hashtags , order by name (dictionary order)*/
-	getHashtagsIndex() : Array<Hashtag> {
+	getHashtagsIndex(): Array<Hashtag> {
 		//{{{
-		const label		= 'HashtagModel -> getHashtagsIndex'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> getHashtagsIndex'
+		log.debug('%s:', label)
 		return this._getStateHashtag().getHashtags()
 			.filter(hashtag => {
 				//$FlowFixMe
-				if(Hashtag.SPECIAL_HASHTAGS[hashtag.name]){
+				if (Hashtag.SPECIAL_HASHTAGS[hashtag.name]) {
 					return false
-				}else{
+				} else {
 					return true
 				}
 			})
-		
+
 		//}}}
 	}
 
@@ -563,17 +563,17 @@ export class HashtagModel {
 	 * 		* The name was not used as alias of others (for stateHashtag, 
 	 * 		getHashtagByName will include the alias name)
 	 */
-	checkHashtagName(hashtag : Hashtag):true{
+	checkHashtagName(hashtag: Hashtag): true {
 		//{{{
-		const label		= 'HashtagModel -> checkHashtagName'
-		log.trace('%s:',label)
-		let hashtagFound		= this._getStateHashtag().getHashtagByName(hashtag.name)
+		const label = 'HashtagModel -> checkHashtagName'
+		log.trace('%s:', label)
+		let hashtagFound = this._getStateHashtag().getHashtagByName(hashtag.name)
 		/*
 		 * REVISE Sat Jun 15 17:54:45 CST 2019
 		 * 	Exclude the special hashtag, because I need to remove some duplicated
 		 * 	special hashtag, and it will throw error from there.
 		 */
-		if(hashtagFound && hashtagFound._id !== hashtag._id && !hashtag.isSpecialHashtag()){
+		if (hashtagFound && hashtagFound._id !== hashtag._id && !hashtag.isSpecialHashtag()) {
 			log.error(
 				'%s:the id is duplicated',
 				label,
@@ -590,28 +590,28 @@ export class HashtagModel {
 	 * child, that means: just move the order of hashtag
 	 */
 	async moveChild(
-		hashtagIdParent : string,
-		hashtagIdChildToMove	: string,
-		hashtagIdChildToDock	: string,
-		direction	: 'before' | 'after'
-	) : Promise<boolean> {
+		hashtagIdParent: string,
+		hashtagIdChildToMove: string,
+		hashtagIdChildToDock: string,
+		direction: 'before' | 'after'
+	): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> moveChild'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> moveChild'
+		log.debug('%s:', label)
 		Hashtag.checkId(hashtagIdParent)
 		Hashtag.checkId(hashtagIdChildToMove)
 		Hashtag.checkId(hashtagIdChildToDock)
-		const hashtag	= this.getHashtagSync(hashtagIdParent)
-		utils.isType(hashtag,'Hashtag')
-		let children	= hashtag.getChildren()
-		const indexOfChildToMove	= children.indexOf(hashtagIdChildToMove)
-		let indexOfChildToDock		= children.indexOf(hashtagIdChildToDock)
+		const hashtag = this.getHashtagSync(hashtagIdParent)
+		utils.isType(hashtag, 'Hashtag')
+		let children = hashtag.getChildren()
+		const indexOfChildToMove = children.indexOf(hashtagIdChildToMove)
+		let indexOfChildToDock = children.indexOf(hashtagIdChildToDock)
 		/*
 		 * if move,dock is the same, then no need do anything, just quit
 		 */
-		if(hashtagIdChildToMove === hashtagIdChildToDock){
+		if (hashtagIdChildToMove === hashtagIdChildToDock) {
 			log.warn(
-				'%s:the two tag is the same, quit, %s,%s', 
+				'%s:the two tag is the same, quit, %s,%s',
 				label,
 				hashtagIdChildToMove,
 				hashtagIdChildToDock,
@@ -621,10 +621,10 @@ export class HashtagModel {
 		/*
 		 * make sure the two hashtag both in the parent children list
 		 */
-		if( 
+		if (
 			indexOfChildToMove < 0 ||
 			indexOfChildToDock < 0
-		){
+		) {
 			log.warn(
 				'%s:not found:%s,%s',
 				label,
@@ -635,35 +635,35 @@ export class HashtagModel {
 		}
 		//move
 		//remove the child to move first
-		children		= [...children.slice(0,indexOfChildToMove),
-			...children.slice(indexOfChildToMove + 1)]
-		indexOfChildToDock	= children.indexOf(hashtagIdChildToDock)
-		if(direction === 'before'){
-			log.debug('%s:insert before',label)
+		children = [...children.slice(0, indexOfChildToMove),
+		...children.slice(indexOfChildToMove + 1)]
+		indexOfChildToDock = children.indexOf(hashtagIdChildToDock)
+		if (direction === 'before') {
+			log.debug('%s:insert before', label)
 			//insert
-			children	= [...children.slice(0,indexOfChildToDock),
+			children = [...children.slice(0, indexOfChildToDock),
 				hashtagIdChildToMove,
-				...children.slice(indexOfChildToDock)]
-		}else if(direction === 'after'){
-			log.debug('%s:insert after',label)
+			...children.slice(indexOfChildToDock)]
+		} else if (direction === 'after') {
+			log.debug('%s:insert after', label)
 			//insert
-			if(indexOfChildToDock === children.length - 1){
-				log.trace('%s:the last one, append directly',label)
+			if (indexOfChildToDock === children.length - 1) {
+				log.trace('%s:the last one, append directly', label)
 				children.push(hashtagIdChildToMove)
-				log.warn('to return :',children)
-			}else{
-				children	= [...children.slice(0,indexOfChildToDock + 1),
+				log.warn('to return :', children)
+			} else {
+				children = [...children.slice(0, indexOfChildToDock + 1),
 					hashtagIdChildToMove,
-					...children.slice(indexOfChildToDock + 1)]
+				...children.slice(indexOfChildToDock + 1)]
 			}
-		}else/*istanbul ignore next*/{
+		} else/*istanbul ignore next*/ {
 			throw utils.E(ERROR.GENERAL_LOGICAL_ERROR)
 		}
 		hashtag.setChildren(children)
-		
+
 		//save to database
 		utils.isType(
-			await utils.a(/*istanbul ignore next*/() => utils.E(),this.hashtagUpdate(hashtag)),
+			await utils.a(/*istanbul ignore next*/() => utils.E(), this.hashtagUpdate(hashtag)),
 			true
 		)
 		return true
@@ -674,16 +674,16 @@ export class HashtagModel {
 	 * stick a hashtag to hashtag:
 	 * set hashtag's stick list add new note 
 	 */
-	async stickHashtag(hashtagIdTarget : string, hashtagIdSticky : string) : Promise<boolean>{
+	async stickHashtag(hashtagIdTarget: string, hashtagIdSticky: string): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> stickHashtag'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> stickHashtag'
+		log.debug('%s:', label)
 		let hashtag
-		hashtag		= this.getHashtagSync(hashtagIdTarget)
-		utils.isType(hashtag,'Hashtag')
-		utils.isType(hashtag.stickHashtag(hashtagIdSticky),true)
+		hashtag = this.getHashtagSync(hashtagIdTarget)
+		utils.isType(hashtag, 'Hashtag')
+		utils.isType(hashtag.stickHashtag(hashtagIdSticky), true)
 		utils.isType(
-			await utils.a(() => utils.E(),this.hashtagUpdate(hashtag)),
+			await utils.a(() => utils.E(), this.hashtagUpdate(hashtag)),
 			true
 		)
 		return true
@@ -694,35 +694,35 @@ export class HashtagModel {
 	 * A convenient way to stickHashtag, the target hashtag is just current 
 	 * hashtag, internal, use  stickHashtag to do things 
 	 */
-	async stickHashtagCurrent(hashtagId :string) : Promise<boolean>{
+	async stickHashtagCurrent(hashtagId: string): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> stickHashtagCurrent'
-		const hashtagIdCurrent	= this._getHashtagIdCurrent().get()
+		const label = 'HashtagModel -> stickHashtagCurrent'
+		const hashtagIdCurrent = this._getHashtagIdCurrent().get()
 		/*istanbul ignore if*/
-		if(!hashtagIdCurrent){
+		if (!hashtagIdCurrent) {
 			throw utils.E(ERROR.GENERAL_NOT_FOUND)
 		}
-		const ok	= await utils.a(() => utils.E(),this.stickHashtag(
+		const ok = await utils.a(() => utils.E(), this.stickHashtag(
 			hashtagIdCurrent,
 			hashtagId))
-		log.debug('%s:',label)
+		log.debug('%s:', label)
 		return true
 		//}}}
 	}
 
 	async unstickHashtag(
-		hashtagIdTarget : string, 
-		hashtagIdSticky : string
-	) : Promise<boolean>{
+		hashtagIdTarget: string,
+		hashtagIdSticky: string
+	): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> unstickHashtag'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> unstickHashtag'
+		log.debug('%s:', label)
 		let hashtag
-		hashtag		= this.getHashtagSync(hashtagIdTarget)
-		utils.isType(hashtag,'Hashtag')
-		utils.isType(hashtag.unstickHashtag(hashtagIdSticky),true)
+		hashtag = this.getHashtagSync(hashtagIdTarget)
+		utils.isType(hashtag, 'Hashtag')
+		utils.isType(hashtag.unstickHashtag(hashtagIdSticky), true)
 		utils.isType(
-			await utils.a(() => utils.E(),this.hashtagUpdate(hashtag)),
+			await utils.a(() => utils.E(), this.hashtagUpdate(hashtag)),
 			true
 		)
 		return true
@@ -731,41 +731,41 @@ export class HashtagModel {
 
 	/* A convenient way to unstickHashtag, the target hashtag is just current 
 	 * hashtag, internal, use  unstickHashtag to do things */
-	async unstickHashtagCurrent(hashtagId :string) : Promise<boolean>{
+	async unstickHashtagCurrent(hashtagId: string): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> unstickHashtagCurrent'
-		const hashtagIdCurrent	= this._getHashtagIdCurrent().get()
+		const label = 'HashtagModel -> unstickHashtagCurrent'
+		const hashtagIdCurrent = this._getHashtagIdCurrent().get()
 		/*istanbul ignore if*/
-		if(!hashtagIdCurrent){
+		if (!hashtagIdCurrent) {
 			throw utils.E(ERROR.GENERAL_NOT_FOUND)
 		}
-		const ok	= await utils.a(() => utils.E(),this.unstickHashtag(
+		const ok = await utils.a(() => utils.E(), this.unstickHashtag(
 			hashtagIdCurrent,
 			hashtagId
 		))
-		log.debug('%s:',label)
+		log.debug('%s:', label)
 		return true
 		//}}}
 	}
 
 	/*istanbul ignore next: no need to test*/
-	async checkHashtagsValidity() : Promise<boolean>{
+	async checkHashtagsValidity(): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> checkHashtagsValidity'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> checkHashtagsValidity'
+		log.debug('%s:', label)
 		/* First, load the all notes */
-		const hashtags	= this._getStateHashtag().getHashtags()
-		log.debug('%s:get hashtags:%d',label,hashtags.length)
-		for(let hashtag of hashtags){
-			const hashtagChecked	= await utils.a(() => utils.E(),hashtag.checkValidity())
-			if(hashtagChecked !== hashtag){
-				log.debug('%s:hashtag changed, update to DB',label)
-				let ok	= await utils.a(() => utils.E(),this.hashtagUpdate(hashtagChecked))
-				utils.isType(ok,true)
+		const hashtags = this._getStateHashtag().getHashtags()
+		log.debug('%s:get hashtags:%d', label, hashtags.length)
+		for (let hashtag of hashtags) {
+			const hashtagChecked = await utils.a(() => utils.E(), hashtag.checkValidity())
+			if (hashtagChecked !== hashtag) {
+				log.debug('%s:hashtag changed, update to DB', label)
+				let ok = await utils.a(() => utils.E(), this.hashtagUpdate(hashtagChecked))
+				utils.isType(ok, true)
 				/* Because the hashtag is re-loaded, so , if any one changed, then, must need 
 				 * to update to redux */
-				ok		= this._getStateHashtag().saveHashtag(hashtagChecked)
-				utils.isType(ok,true)
+				ok = this._getStateHashtag().saveHashtag(hashtagChecked)
+				utils.isType(ok, true)
 			}
 		}
 		return true
@@ -778,24 +778,24 @@ export class HashtagModel {
 	 * REVISE: here do not save/update hashtag to db really, the save action 
 	 * will be done when user click the 'SAVE' button on hashtag setting dialog
 	 */
-	async addAlias ( 
-		hashtag : Hashtag, 
-		aliasName : string 
-	) : Promise<boolean> {
+	async addAlias(
+		hashtag: Hashtag,
+		aliasName: string
+	): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> addAlias'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> addAlias'
+		log.debug('%s:', label)
 		//check
 		utils.isTypeInstance(hashtag, Hashtag)
 		Hashtag.checkNameFormat(aliasName)
 		/*
 		 * check if this name is find to add as alias, it should not exist already
 		 */
-		const hashtagInRedux		= this._getStateHashtag().getHashtagByName(aliasName)
-		if(hashtagInRedux){
+		const hashtagInRedux = this._getStateHashtag().getHashtagByName(aliasName)
+		if (hashtagInRedux) {
 			throw utils.E(ERROR.HASHTAG_ALIAS_NAME_DUPLICATED)
 		}
-		const alias		= new HashtagAlias()
+		const alias = new HashtagAlias()
 		alias.setName(aliasName)
 		hashtag.addAlias(alias)
 		return true
@@ -807,16 +807,16 @@ export class HashtagModel {
 	 * cache 
 	 * REVISE: do not save/update hashtag to db here, see above addAlias()
 	 */
-	async removeAlias ( 
-		hashtag : Hashtag , 
-		id : string 
-	) : Promise<boolean>{
+	async removeAlias(
+		hashtag: Hashtag,
+		id: string
+	): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> removeAlias'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> removeAlias'
+		log.debug('%s:', label)
 		//check
 		utils.isTypeInstance(hashtag, Hashtag)
-		const alias		= hashtag.getAlias(id)
+		const alias = hashtag.getAlias(id)
 		hashtag.removeAlias(id)
 		return true
 		//}}}
@@ -828,60 +828,60 @@ export class HashtagModel {
 	 *
 	 * REVISE: if this hashtag has parents, need to remove it from parents
 	 */
-	async removeHashtag ( hashtagId : string ) : Promise<boolean> {
+	async removeHashtag(hashtagId: string): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> removeHashtag'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> removeHashtag'
+		log.debug('%s:', label)
 		//check
 		Hashtag.checkId(hashtagId)
 		//check permission
-		if(hashtagId === Hashtag.HASHTAG_ROOT_ID){
+		if (hashtagId === Hashtag.HASHTAG_ROOT_ID) {
 			log.debug('%s:try to delete root tag', label)
 			throw utils.E(ERROR.GENERAL_OPERATION_FORBIDDEN)
 		}
 		//load the hashtag
-		let hashtag		= this.getHashtagSync(hashtagId)
+		let hashtag = this.getHashtagSync(hashtagId)
 		/*
 		 * REVISE Sat Jun 15 17:46:00 CST 2019
 		 * 	Can delete special hashtag, now, I find there are some duplicated 
 		 * 	special hashtag, so I need use this api to remove them.
 		 */
-//		/*
-//		 * check permission
-//		 */
-//		if(hashtag.isSpecialHashtag()){
-//			log.debug('%s:try to delete special tag', label)
-//			throw utils.E(ERROR.GENERAL_OPERATION_FORBIDDEN)
-//		}
+		//		/*
+		//		 * check permission
+		//		 */
+		//		if(hashtag.isSpecialHashtag()){
+		//			log.debug('%s:try to delete special tag', label)
+		//			throw utils.E(ERROR.GENERAL_OPERATION_FORBIDDEN)
+		//		}
 		//TODO no need to load all notes to check, maybe just 1 results is OK
-		const notes		= await utils.a(/*istanbul ignore next*/() => utils.E(),this._getNoteModel().getNotes(hashtagId))
-		if(notes.length !== 0){
+		const notes = await utils.a(/*istanbul ignore next*/() => utils.E(), this._getNoteModel().getNotes(hashtagId))
+		if (notes.length !== 0) {
 			throw utils.E(ERROR.HASHTAG_DELETE_WITH_NOTES)
 		}
 		/*
 		 * First, set an empty definition of this hashtag and update, this is to
 		 * remove all the parent hashtag to remove me
 		 */
-		const hashtagToUpdate		= hashtag.cloneHashtag()
+		const hashtagToUpdate = hashtag.cloneHashtag()
 		//set definition
 		hashtagToUpdate.setDefinition(new Note())
 		//update
 		utils.isType(
-			await utils.a(() => utils.E(),this.updateHashtagComplex(
+			await utils.a(() => utils.E(), this.updateHashtagComplex(
 				hashtag,
 				hashtagToUpdate,
 				{
-					isTest		: false,
+					isTest: false,
 				}
 			)),
-			{result:true}
+			{ result: true }
 		)
 		/*
 		 * After update, need to re-load it from redux, cuz the rev is changed
 		 */
-		hashtag		= this.getHashtagSync(hashtagId)
+		hashtag = this.getHashtagSync(hashtagId)
 		utils.isType(
-			await utils.a(/*istanbul ignore next*/() => utils.E(),this._getDBNote().removeHashtag(hashtag)),
+			await utils.a(/*istanbul ignore next*/() => utils.E(), this._getDBNote().removeHashtag(hashtag)),
 			true
 		)
 		//To remove the data in cache of redux
@@ -896,17 +896,17 @@ export class HashtagModel {
 		/*
 		 * if CURRENT hashtag is this tag, then change it to root
 		 */
-		if(this._getHashtagIdCurrent().get() === hashtagId){
+		if (this._getHashtagIdCurrent().get() === hashtagId) {
 			/*
 			 * load document
 			 */
 			utils.isType(
-				await utils.a(/*istanbul ignore next*/() => utils.E(), this._getNoteModel().loadDocument(Hashtag.HASHTAG_ROOT_ID )),
+				await utils.a(/*istanbul ignore next*/() => utils.E(), this._getNoteModel().loadDocument(Hashtag.HASHTAG_ROOT_ID)),
 				true
 			)
 			//check the data
 			utils.isType(
-				await utils.a(() => utils.E(),this._getNavigatorModel().checkNavigator()),
+				await utils.a(() => utils.E(), this._getNavigatorModel().checkNavigator()),
 				'boolean'
 			)
 		}
@@ -920,37 +920,37 @@ export class HashtagModel {
 	 * for the hashtag it is not on the mindmap, then it just has a
 	 * parent: the root
 	 */
-	getBreadcrumbs( hashtagId : string ) : Array<string> {
+	getBreadcrumbs(hashtagId: string): Array<string> {
 		//{{{
-		const label		= 'HashtagModel -> getBreadcrumbs'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> getBreadcrumbs'
+		log.debug('%s:', label)
 		//check
 		Hashtag.checkId(hashtagId)
-		const result		= [hashtagId]
-		const hashtag		= this.getHashtagSync(hashtagId)
-		if(hashtagId === Hashtag.HASHTAG_ROOT_ID){
+		const result = [hashtagId]
+		const hashtag = this.getHashtagSync(hashtagId)
+		if (hashtagId === Hashtag.HASHTAG_ROOT_ID) {
 			/*
 			 * If current is root tag, then, the breadcrumb is empty,
 			 * no need to add the duplicated root hashtag here
 			 */
-		}else if(hashtag.getParents().length === 0){
-			log.trace('%s:has no parent, just add root',label)
+		} else if (hashtag.getParents().length === 0) {
+			log.trace('%s:has no parent, just add root', label)
 			result.unshift(Hashtag.HASHTAG_ROOT_ID)
-		}else{
-			let i		= 0
-			let hashtagCurrent		= hashtag
-			for(;i < 100; i++){
-				const parents		= hashtagCurrent.getParents()
-				if(parents.length > 0){
-					const parent		= parents[0]
+		} else {
+			let i = 0
+			let hashtagCurrent = hashtag
+			for (; i < 100; i++) {
+				const parents = hashtagCurrent.getParents()
+				if (parents.length > 0) {
+					const parent = parents[0]
 					result.unshift(parent)
-					hashtagCurrent		= this.getHashtagSync(parent)
-				}else{
+					hashtagCurrent = this.getHashtagSync(parent)
+				} else {
 					break
 				}
 			}
 			/* May be the parent tree do not point to root */
-			if(result[0] !== Hashtag.HASHTAG_ROOT_ID){
+			if (result[0] !== Hashtag.HASHTAG_ROOT_ID) {
 				result.unshift(Hashtag.HASHTAG_ROOT_ID)
 			}
 		}
@@ -970,50 +970,50 @@ export class HashtagModel {
 	 * to check which alias was delete, then need to remove it from redux 
 	 */
 	async updateHashtagComplex(
-		origin		: Hashtag,
-		target		: Hashtag,
-		options		: {
-			isTest		: boolean,
-		}		= {
-			isTest		: true,
-		},
-	) : Promise<{
+		origin: Hashtag,
+		target: Hashtag,
+		options: {
+			isTest: boolean,
+		} = {
+				isTest: true,
+			},
+	): Promise<{
 		/*
 		 * true		: the hashtag updated successfully
 		 * false		: the hashtag did not updated cuz, maybe this is a test
 		 */
-		result		: boolean,
+		result: boolean,
 		//The hashtag which were dropped from definition
-		hashtagIdsDefinitionDropped		: Array<string>,
-		hashtagIdsDefinitionAdded		: Array<string>,
-		aliasesAdded		: Array<HashtagAlias>,
-		aliasesDropped		: Array<HashtagAlias>,
+		hashtagIdsDefinitionDropped: Array<string>,
+		hashtagIdsDefinitionAdded: Array<string>,
+		aliasesAdded: Array<HashtagAlias>,
+		aliasesDropped: Array<HashtagAlias>,
 		//if true, then will re-put all the notes of this hashtag, to re-build
 		//index
-		needUpdateNotes		: boolean,
+		needUpdateNotes: boolean,
 	}> {
 		//{{{
-		const label		= 'HashtagModel -> updateHashtagComplex'
-		log.debug('%s:',label)
+		const label = 'HashtagModel -> updateHashtagComplex'
+		log.debug('%s:', label)
 		//result
-		let result		= {}
+		let result = {}
 		/*
 		 * Compare the definition change
 		 */
-		const hashtagIdsDefinitionOrigin		= Object.values(
+		const hashtagIdsDefinitionOrigin = Object.values(
 			origin.getDefinition().noteHashtagMap
 		).map(noteHashtag => {
 			//$FlowFixMe
 			return noteHashtag.hashtagId
 		})
-		const hashtagIdsDefinitionTarget		= Object.values(
+		const hashtagIdsDefinitionTarget = Object.values(
 			target.getDefinition().noteHashtagMap
 		).map(noteHashtag => {
 			//$FlowFixMe
 			return noteHashtag.hashtagId
 		})
 		//dropped
-		result.hashtagIdsDefinitionDropped		= hashtagIdsDefinitionOrigin.filter(hashtagId => {
+		result.hashtagIdsDefinitionDropped = hashtagIdsDefinitionOrigin.filter(hashtagId => {
 			return hashtagIdsDefinitionTarget.every(hashtagIdTarget => {
 				return hashtagIdTarget !== hashtagId
 			})
@@ -1021,9 +1021,9 @@ export class HashtagModel {
 		/*
 		 * Get the added definition hashtag ids 
 		 */
-		result.hashtagIdsDefinitionAdded		= hashtagIdsDefinitionTarget.filter(hashtagId => {
+		result.hashtagIdsDefinitionAdded = hashtagIdsDefinitionTarget.filter(hashtagId => {
 			return hashtagIdsDefinitionOrigin.every(hashtagIdOrigin => {
-				return hashtagIdOrigin	!== hashtagId
+				return hashtagIdOrigin !== hashtagId
 			})
 		})
 		/*
@@ -1037,10 +1037,10 @@ export class HashtagModel {
 		 * Need update notes or not? If definition added/dropped some hashtag,
 		 * then, AND there is note under the hashtag, then, update is needed
 		 */
-		if(
+		if (
 			result.hashtagIdsDefinitionDropped.length > 0 ||
 			result.hashtagIdsDefinitionAdded.length > 0
-		){
+		) {
 			log.debug(
 				'%s:some hashtag dropped/added from definition',
 				label,
@@ -1049,48 +1049,48 @@ export class HashtagModel {
 			 * Is there notes ?
 			 * TODO optimize 
 			 */
-			const notes		= await utils.a(() => utils.E(),this._getNoteModel().getNotes(target._id))
-			if(notes.length > 0){
-				result.needUpdateNotes		= true
-			}else{
-				log.debug('%s:there is no note, do not update',label)
+			const notes = await utils.a(() => utils.E(), this._getNoteModel().getNotes(target._id))
+			if (notes.length > 0) {
+				result.needUpdateNotes = true
+			} else {
+				log.debug('%s:there is no note, do not update', label)
 			}
-		}else{
+		} else {
 			log.debug(
 				'%s:no hashtags dropped',
 				label
 			)
-			result.needUpdateNotes		= false
+			result.needUpdateNotes = false
 		}
 		/*
 		 * handle the alias, get alias added/dropped list
 		 */
-		const aliasOrigin		= origin.getAliases()
+		const aliasOrigin = origin.getAliases()
 		log.debug('%s:origin alias:%o', label, aliasOrigin)
-		const aliasTarget		= target.getAliases()
+		const aliasTarget = target.getAliases()
 		log.debug('%s:target alias:%o', label, aliasTarget)
 		//BACK is there some problem ? 
-		result.aliasesAdded		= aliasTarget.filter(alias => {
+		result.aliasesAdded = aliasTarget.filter(alias => {
 			return aliasOrigin.every(aliasB => aliasB._id !== alias._id)
 		})
-		result.aliasesDropped		= aliasOrigin.filter(alias => {
+		result.aliasesDropped = aliasOrigin.filter(alias => {
 			return aliasTarget.every(aliasB => aliasB._id !== alias._id)
 		})
 		/*
 		 * If it is test, just return
 		 * If not, update
 		 */
-		if(options.isTest){
-			log.trace('%s:to test',label)
+		if (options.isTest) {
+			log.trace('%s:to test', label)
 			//test return false
-			result.result		= false
-		}else{
-			log.trace('%s:to update',label)
+			result.result = false
+		} else {
+			log.trace('%s:to update', label)
 			/*
 			 * Invoke the hashtagUpdate to save hashtag directly
 			 */
 			utils.isType(
-				await utils.a(/*istanbul ignore next*/() => utils.E(),this.hashtagUpdate(target)),
+				await utils.a(/*istanbul ignore next*/() => utils.E(), this.hashtagUpdate(target)),
 				true
 			)
 			/*
@@ -1101,11 +1101,11 @@ export class HashtagModel {
 				label,
 				result.hashtagIdsDefinitionDropped
 			)
-			for(let hashtagId of result.hashtagIdsDefinitionDropped){
+			for (let hashtagId of result.hashtagIdsDefinitionDropped) {
 				//get parent object
-				const parent		= this.getHashtagSync(hashtagId)
+				const parent = this.getHashtagSync(hashtagId)
 				//remove
-				const children		= parent.getChildren()
+				const children = parent.getChildren()
 				parent.setChildren(children.filter(hashtagId => hashtagId !== target._id))
 				//save
 				utils.isType(
@@ -1116,10 +1116,10 @@ export class HashtagModel {
 			/*
 			 * To remove the dropped aliases in redux
 			 */
-			for(let alias of result.aliasesDropped){
+			for (let alias of result.aliasesDropped) {
 				log.trace('%s:to remove alias:%s', label, alias)
-				let ok		= this._getStateHashtag().removeHashtagByName(alias.getName())
-				utils.isType(ok,true)
+				let ok = this._getStateHashtag().removeHashtagByName(alias.getName())
+				utils.isType(ok, true)
 			}
 			/*
 			 * Now, think about all of the descendants of modified hashtag, 
@@ -1141,20 +1141,20 @@ export class HashtagModel {
 			/*
 			 * To update all notes if need
 			 */
-			if(result.needUpdateNotes){
-				log.debug('%s:begin update notes',label)
-				const notes		= await utils.a(
+			if (result.needUpdateNotes) {
+				log.debug('%s:begin update notes', label)
+				const notes = await utils.a(
 					() => utils.E(),
 					this._getNoteModel().getNotes(target._id)
 				)
-				for(let note of notes){
+				for (let note of notes) {
 					utils.isType(
-						await utils.a(/*istanbul ignore next*/() => utils.E(),this._getNoteModel().noteUpdate(note)),
+						await utils.a(/*istanbul ignore next*/() => utils.E(), this._getNoteModel().noteUpdate(note)),
 						true
 					)
 				}
 			}
-			result.result		= true
+			result.result = true
 		}
 		log.trace(
 			'%s:result,alias,add:%d,drop:%d',
@@ -1171,12 +1171,12 @@ export class HashtagModel {
 	 * ancestor, this is useful when user change the structure of the mindmap
 	 * tree, then maybe some node/hashtag should update their ancestor
 	 */
-	async updateDescendantsAncestor(hashtagId : string) : Promise<boolean>{
+	async updateDescendantsAncestor(hashtagId: string): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> updateDescendantsAncestor'
-		log.debug('%s:',label)
-		const descendants		= this.getDescendants(hashtagId)
-		for(let hashtagId of descendants){
+		const label = 'HashtagModel -> updateDescendantsAncestor'
+		log.debug('%s:', label)
+		const descendants = this.getDescendants(hashtagId)
+		for (let hashtagId of descendants) {
 			utils.isType(
 				await utils.a(/*istanbul ignore next*/() => utils.E(), this.updateAncestor(hashtagId)),
 				true
@@ -1190,14 +1190,14 @@ export class HashtagModel {
 	 * To get all the child and descendants of a hashtag, all the node
 	 * under a hashtag, on the mindmap tree
 	 */
-	getDescendants(hashtagId : string):Array<string>{
+	getDescendants(hashtagId: string): Array<string> {
 		//{{{
-		const label		= 'HashtagModel -> getDescendants'
-		log.debug('%s:',label)
-		const result		= []
-		const getChildren		= (hashtagId : string) => {
-			const hashtag		= this.getHashtagSync(hashtagId)
-			for(let childId of hashtag.getChildren()){
+		const label = 'HashtagModel -> getDescendants'
+		log.debug('%s:', label)
+		const result = []
+		const getChildren = (hashtagId: string) => {
+			const hashtag = this.getHashtagSync(hashtagId)
+			for (let childId of hashtag.getChildren()) {
 				result.push(childId)
 				getChildren(childId)
 			}
@@ -1213,15 +1213,15 @@ export class HashtagModel {
 	 * hashtag's ancestor field, if its different, then update the hashtag
 	 * using new ancestor value
 	 */
-	async updateAncestor(hashtagId : string):Promise<boolean>{
+	async updateAncestor(hashtagId: string): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> updateAncestor'
-		log.debug('%s:',label)
-		const hashtag		= this.getHashtagSync(hashtagId)
-		const ancestor		= []
-		const upToTop		= (hashtagId) => {
-			const hashtag		= this.getHashtagSync(hashtagId)
-			for(let parentId of hashtag.getParents()){
+		const label = 'HashtagModel -> updateAncestor'
+		log.debug('%s:', label)
+		const hashtag = this.getHashtagSync(hashtagId)
+		const ancestor = []
+		const upToTop = (hashtagId) => {
+			const hashtag = this.getHashtagSync(hashtagId)
+			for (let parentId of hashtag.getParents()) {
 				ancestor.push(parentId)
 				//REVISE change to recursive fn to bubble up to the top 
 				//to update the parents id
@@ -1229,22 +1229,22 @@ export class HashtagModel {
 			}
 		}
 		upToTop(hashtagId)
-		const isEqual		= (a : Array<string>, b : Array<string>):boolean=> {
-			if(a !== undefined && b === undefined){
+		const isEqual = (a: Array<string>, b: Array<string>): boolean => {
+			if (a !== undefined && b === undefined) {
 				return false
-			}else if(a === undefined && b !== undefined){
+			} else if (a === undefined && b !== undefined) {
 				return false
-			}else if(a === undefined && b === undefined){
+			} else if (a === undefined && b === undefined) {
 				return true
-			}else{
+			} else {
 				//a,b all are defined
 				return a.every(e => b.some(f => f === e)) &&
 					b.every(e => a.some(f => f === e))
 			}
 		}
-		if(isEqual(ancestor, hashtag.getAncestor())){
+		if (isEqual(ancestor, hashtag.getAncestor())) {
 			log.debug('%s:ancestor is no problem', label)
-		}else{
+		} else {
 			log.debug('%s:ancestor changed, update', label)
 			hashtag.setAncestor(ancestor)
 			utils.isType(
@@ -1273,15 +1273,15 @@ export class HashtagModel {
 	 *
 	 */
 	/*istanbul ignore next: no need to test*/
-	async buildHashtagTree(tree : Object):Promise<boolean>{
+	async buildHashtagTree(tree: Object): Promise<boolean> {
 		//{{{
-		const label		= 'HashtagModel -> buildHashtagTree'
-		log.debug('%s:',label)
-		const goThrough		= async (hashtagObject, hashtagParent) => {
-			const hashtag		= new Hashtag(hashtagObject.name)
+		const label = 'HashtagModel -> buildHashtagTree'
+		log.debug('%s:', label)
+		const goThrough = async (hashtagObject, hashtagParent) => {
+			const hashtag = new Hashtag(hashtagObject.name)
 			//the parent/definition
-			if(hashtagParent){
-				const definition		= new Note()
+			if (hashtagParent) {
+				const definition = new Note()
 				definition.setContent('is a:', hashtagParent)
 				hashtag.setDefinition(definition)
 			}
@@ -1290,7 +1290,7 @@ export class HashtagModel {
 				await utils.a(() => utils.E(), this.createHashtag(hashtag)),
 				true
 			)
-			for(let child of hashtagObject.children){
+			for (let child of hashtagObject.children) {
 				await utils.a(() => utils.E(), goThrough(child, hashtag))
 			}
 		}
@@ -1302,38 +1302,38 @@ export class HashtagModel {
 	/*
 	 * To check if the given hashtags can be parent of another hashtag
 	 */
-	checkDefinition(parentIds : Array<string>, childId : string):true{
+	checkDefinition(parentIds: Array<string>, childId: string): true {
 		//{{{
-		const label		= 'HashtagModel -> checkDefinition'
-		log.debug('%s:',label)
-		const hashtagIdsViolation		= []
-		const child		= this.getHashtagSync(childId)
-		for(let id of parentIds){
-			try{
-				const hashtag		= this.getHashtagSync(id)
-				if(
+		const label = 'HashtagModel -> checkDefinition'
+		log.debug('%s:', label)
+		const hashtagIdsViolation = []
+		const child = this.getHashtagSync(childId)
+		for (let id of parentIds) {
+			try {
+				const hashtag = this.getHashtagSync(id)
+				if (
 					hashtag.getAncestor().includes(childId) ||
 					//root is always everyone's ancestor
 					childId === Hashtag.HASHTAG_ROOT_ID ||
 					//tag can not define itself
 					childId === hashtag._id
-				){
+				) {
 					hashtagIdsViolation.push(id)
 				}
-			}catch(e){
-				if(e.message === ERROR.GENERAL_NOT_FOUND){
+			} catch (e) {
+				if (e.message === ERROR.GENERAL_NOT_FOUND) {
 					/*
 					 * if not found, fine, it will pass
 					 */
-				}else{
+				} else {
 					throw e
 				}
 			}
 		}
-		if(hashtagIdsViolation.length > 0){
-			const e		= utils.E(ERROR.HASHTAG_DEFINITION_VIOLATION)
+		if (hashtagIdsViolation.length > 0) {
+			const e = utils.E(ERROR.HASHTAG_DEFINITION_VIOLATION)
 			//$FlowFixMe
-			e.data		= hashtagIdsViolation
+			e.data = hashtagIdsViolation
 			throw e
 		}
 		return true
