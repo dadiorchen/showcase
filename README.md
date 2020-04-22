@@ -53,3 +53,5 @@ I use Pomodoro Tech for time management, this is a screenshot of my pomodoro rep
 I use Trello and Slack for team communication and coordination, here is a screenshot.
 
 ![Trello](./figure_trello.png)
+
+![Slack](./Screen Shot 2020-04-22 at 8.53.39 AM.png)
