@@ -54,4 +54,4 @@ I use Trello and Slack for team communication and coordination, here is a screen
 
 ![Trello](./figure_trello.png)
 
-![Slack](./Screen Shot 2020-04-22 at 8.53.39 AM.png)
+![Slack](./slack.png)
